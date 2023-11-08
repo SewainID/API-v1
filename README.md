@@ -17,7 +17,7 @@ git checkout -b [nama-feature]
 ```
 - 3. (kerjain fiturnya)
 
-4. add dan commit
+- 4. add dan commit
 
 ```
 git add .
@@ -25,4 +25,4 @@ git commit -m "Nama Feature - Nama Perubahan"
 
 git push origin [nama-branch-feature]
 ```
-5. baru bikin pull request ke branch develop di github
+- 5. baru bikin pull request ke branch develop di github
