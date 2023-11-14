@@ -1,14 +1,12 @@
+const router = require('./src/routes')
 const express = require('express');
 const app = express();
-const port = 3000;
+require('dotenv').config();
 
-app.get('/ping', (req, res) => {
-  res.json({ message: 'Ping!' });
-});
 
-app.get('/version', (req, res) => {
-  res.json({ version: '1.0.0' });
-});
+const port = process.env.PORT || 3000;
+
+app.use('/api/v1/', router)
 
 // Menjalankan server
 app.listen(port, () => {
