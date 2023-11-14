@@ -8,7 +8,7 @@ git clone https://github.com/ForRentIT/API-v1.git
 
 - 1. Checkout ke branch master
 ```
-git checkout develop
+git checkout master
 ```
 - 1.a pull updatean dari master
 ```
