@@ -15,5 +15,14 @@
     "jsonwebtoken": "^9.0.2",
     "sequelize": "^6.35.0",
     "sqlite3": "^5.1.6"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ForRentIT/API-v1.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ForRentIT/API-v1/issues"
+  },
+  "homepage": "https://github.com/ForRentIT/API-v1#readme"
 }
