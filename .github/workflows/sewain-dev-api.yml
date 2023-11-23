@@ -100,9 +100,8 @@ jobs:
         with:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
-          credentials_json: '${{ secrets.SA_CREDS }}'
           # NOTE: If using a pre-built image, update the image name here
-          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ secrets.GAR_REPO }}:${{ github.sha }}
+          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ secrets.GAR_REPO }}/sewain-dev-api::${{ github.sha }}
           env_vars: "PGHOST=${{ secrets.PGHOST }},PGUSER=${{ secrets.PGUSER }},PGPASSWORD=${{ secrets.PGPASSWORD }},PGDATABASE=${{ secrets.PGDATABASE }}"
           flags: "--allow-unauthenticated --vpc-connector vpc-conn --add-cloudsql-instances '${{ env.PROJECT_ID }}:${{env.REGION}}:${{env.DATABASE_INSTANCE}}'"
 
