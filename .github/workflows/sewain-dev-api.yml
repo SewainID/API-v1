@@ -3,35 +3,29 @@ name: Deploy to Google Cloud Run
 on:
   push:
     branches:
-      - dev
+      - main  # or your default branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build
-        run: npm run build
-
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1.1.1
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.x.x  # Use the latest version
         with:
           service_account_key: ${{ secrets.SA_CREDS }}
-          project_id: ${{ env.PROJECT_ID }}
+          project_id: ${{ env.sewain-405712}}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker
 
       - name: Build and push Docker image
         run: |
-          gcloud builds submit --tag gcr.io/$GCP_PROJECT/my-app
+          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/myapp:$GITHUB_SHA
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy my-app --image gcr.io/$GCP_PROJECT/my-app --platform managed --region us-central1 --allow-unauthenticated
+          gcloud run deploy myapp --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/myapp:$GITHUB_SHA --platform managed --region us-central1 --allow-unauthenticated
