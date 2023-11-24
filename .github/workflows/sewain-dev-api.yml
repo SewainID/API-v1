@@ -18,7 +18,9 @@ jobs:
         with:
           service_account_key: ${{ secrets.SA_CREDS }}
           project_id: ${{ secrets.GCP_PROJECT_ID}}
-
+      - name: Authenticate with gcloud
+        run: |
+          gcloud auth activate-service-account --key-file=${{ secrets.SA_CREDS }}
       - name: Configure Docker
         run: gcloud auth configure-docker
 
