@@ -9,9 +9,9 @@ COPY package*.json ./
 
 # Step 4: Install dependencies
 RUN npm install
-RUN npx sequelize-cli db:migrate
 # Step 5: Copy the rest of the application code
 COPY . .
+RUN npx sequelize-cli db:migrate
 
 # Step 6: Expose the port the app runs on
 EXPOSE 3000
