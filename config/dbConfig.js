@@ -2,7 +2,7 @@ require('dotenv').config(); // Menggunakan dotenv untuk mengatur variabel lingku
 
 const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize({
+const dbConfig = {
   dialect: 'postgres',
   host: process.env.PGHOST, // Menggunakan variabel lingkungan
   port: process.env.PGPORT, // Menggunakan variabel lingkungan
@@ -12,7 +12,8 @@ const sequelize = new Sequelize({
   define: {
     timestamps: false,
   },
-});
+}
+
+const sequelize = new Sequelize(dbConfig);
 
 module.exports = { sequelize };
-``
