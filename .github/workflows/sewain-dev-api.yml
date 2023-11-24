@@ -17,7 +17,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v1.1.1  # Use the latest version
         with:
           service_account_key: ${{ secrets.SA_CREDS }}
-          project_id: ${{ env.sewain-405712}}
+          project_id: ${{ secrets.GCP_PROJECT_ID}}
 
       - name: Configure Docker
         run: gcloud auth configure-docker
