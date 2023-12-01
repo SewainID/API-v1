@@ -1,4 +1,5 @@
-const Catalog = require("../../models/catalogs");
+const express = require('express');
+const Catalog = require("../../models/CatalogsModel");
 const router = express.Router(); 
 const Joi = require("joi");
 
@@ -13,10 +14,10 @@ const getAllCatalogs = async (req, res) => {
 };
 
 // Get catalog by ID
-const getCatalogById = async (req, res) => {
-  const { id } = req.params;
+const getCatalogByid = async (req, res) => {
+  const CatalogByid = req.params.id;
   try {
-    const catalog = await Catalog.findByPk(id);
+    const catalog = await Catalog.findByPk(CatalogByid);
     if (!catalog) {
       return res.status(404).json({ error: "Catalog not found" });
     }
@@ -31,7 +32,7 @@ const createCatalogs = async (req, res) => {
   const { name, description, size, price, status, day_rent, day_maintenance } =
     req.body;
 
-  const schema = Joi.object({
+  const Catalogschema = Joi.object({
     name: Joi.string().required(),
     description: Joi.string(),
     size: Joi.string(),
@@ -41,13 +42,13 @@ const createCatalogs = async (req, res) => {
     day_maintenance: Joi.number().required(),
   });
 
-  const { error } = schema.validate(req.body);
+  const { error } = Catalogschema.validate(req.body);
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
   }
 
   try {
-    const newCatalog = await Catalog.create({
+    const newCatalogs = await Catalog.create({
       name,
       description,
       size,
@@ -56,7 +57,7 @@ const createCatalogs = async (req, res) => {
       day_rent,
       day_maintenance,
     });
-    return res.status(201).json(newCatalog);
+    return res.status(201).json(newCatalogs);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -64,12 +65,12 @@ const createCatalogs = async (req, res) => {
 
 // Update a catalog
 const updateCatalogs = async (req, res) => {
-  const { id } = req.params;
+  const CatalogUpdate = req.params.id;
   const { name, description, size, price, status, day_rent, day_maintenance } =
     req.body;
 
   try {
-    const catalog = await Catalog.findByPk(id);
+    const catalog = await Catalog.findByPk(CatalogUpdate);
     if (!catalog) {
       return res.status(404).json({ error: "Catalog not found" });
     }
@@ -98,10 +99,10 @@ const updateCatalogs = async (req, res) => {
 };
 
 // Delete a catalog
-const deleteCatalogs = async (req, res) => {
-  const { id } = req.params;
+const deleteCatalogs =async (req, res) => {
+  const CatalogsDelete = req.params.id;
   try {
-    const catalog = await Catalog.findByPk(id);
+    const catalog = await Catalog.findByPk(CatalogsDelete);
     if (!catalog) {
       return res.status(404).json({ error: "Catalog not found" });
     }
@@ -120,7 +121,7 @@ const deleteCatalogs = async (req, res) => {
 
 module.exports = {
   getAllCatalogs,
-  getCatalogById,
+  getCatalogByid,
   createCatalogs,
   updateCatalogs,
   deleteCatalogs,

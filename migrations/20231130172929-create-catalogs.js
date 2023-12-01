@@ -1,4 +1,6 @@
 'use strict';
+const {DataTypes} = require('sequelize');
+const {sequelize} = require('../config/dbConfig'); // Menggunakan objek sequelize dari konfigurasi koneksi database
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -7,36 +9,36 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER
       },
       name: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       description: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       size: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       price: {
-        type: Sequelize.FLOAT
+        type: DataTypes.FLOAT
       },
       status: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       day_rent: {
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER
       },
       day_maintenance: {
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       }
     });
   },
