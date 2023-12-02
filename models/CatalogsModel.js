@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/dbConfig");
 
-const Catalog = sequelize.define("Catalog", {
+const Catalog = sequelize.define("catalogs", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
