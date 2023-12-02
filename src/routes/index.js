@@ -5,7 +5,7 @@ const { ping } = require('../controllers/pingController');
 const { auth } = require('../middleware/auth');
 const userController = require('../controllers/Users');
 const { login, register } = require('../controllers/auth');
-const { getAllCatalogs, getCatalogByid, createCatalogs, updateCatalogs, deleteCatalogs} = require('../controllers/catalogController');
+const catalogController = require('../controllers/catalogController'); // Tambahkan ini
 
 // Endpoint untuk mendapatkan versi
 router.get('/version', getVersion);
@@ -25,19 +25,11 @@ router.post('/register', register);
 // Endpoint untuk login
 router.post('/login', login);
 
-// Endpoint untuk Get all catalogs
-router.get('/catalogs', getAllCatalogs);
-
-// Endpoint untuk Get catalog by ID
-router.get('/catalogs/:id', getCatalogByid);
-
-// Endpoint untuk Create a new catalog
-router.post('/catalogs', createCatalogs);
-
-// Endpoint untuk Update a catalog
-router.put('/catalogs/:id', updateCatalogs);
-
-// Endpoint untuk Delete a catalog
-router.delete('/catalogs/:id', deleteCatalogs);
+// Endpoint untuk Catalog
+router.get('/catalogs', catalogController.getAllCatalogs);
+router.get('/catalogs/:id', catalogController.getCatalogByid);
+router.post('/catalogs', catalogController.createCatalogs);
+router.put('/catalogs/:id', catalogController.updateCatalogs);
+router.delete('/catalogs/:id', catalogController.deleteCatalogs);
 
 module.exports = router;

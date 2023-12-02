@@ -1,7 +1,5 @@
-const express = require('express');
-const Catalog = require("../../models/CatalogsModel");
-const router = express.Router(); 
-const Joi = require("joi");
+const Catalog = require('../../models/catalog');
+const Joi = require('joi');
 
 // Get all catalogs
 const getAllCatalogs = async (req, res) => {
@@ -19,7 +17,7 @@ const getCatalogByid = async (req, res) => {
   try {
     const catalog = await Catalog.findByPk(CatalogByid);
     if (!catalog) {
-      return res.status(404).json({ error: "Catalog not found" });
+      return res.status(404).json({ error: 'Catalog not found' });
     }
     return res.json(catalog);
   } catch (error) {
@@ -29,8 +27,7 @@ const getCatalogByid = async (req, res) => {
 
 // Create a new catalog
 const createCatalogs = async (req, res) => {
-  const { name, description, size, price, status, day_rent, day_maintenance } =
-    req.body;
+  const { name, description, size, price, status, day_rent, day_maintenance } = req.body;
 
   const Catalogschema = Joi.object({
     name: Joi.string().required(),
@@ -66,13 +63,12 @@ const createCatalogs = async (req, res) => {
 // Update a catalog
 const updateCatalogs = async (req, res) => {
   const CatalogUpdate = req.params.id;
-  const { name, description, size, price, status, day_rent, day_maintenance } =
-    req.body;
+  const { name, description, size, price, status, day_rent, day_maintenance } = req.body;
 
   try {
     const catalog = await Catalog.findByPk(CatalogUpdate);
     if (!catalog) {
-      return res.status(404).json({ error: "Catalog not found" });
+      return res.status(404).json({ error: 'Catalog not found' });
     }
 
     await Catalog.update(
@@ -92,19 +88,19 @@ const updateCatalogs = async (req, res) => {
       }
     );
 
-    return res.json({ message: "Catalog updated successfully" });
+    return res.json({ message: 'Catalog updated successfully' });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
 
 // Delete a catalog
-const deleteCatalogs =async (req, res) => {
+const deleteCatalogs = async (req, res) => {
   const CatalogsDelete = req.params.id;
   try {
     const catalog = await Catalog.findByPk(CatalogsDelete);
     if (!catalog) {
-      return res.status(404).json({ error: "Catalog not found" });
+      return res.status(404).json({ error: 'Catalog not found' });
     }
 
     await Catalog.destroy({
@@ -113,7 +109,7 @@ const deleteCatalogs =async (req, res) => {
       },
     });
 
-    return res.json({ message: "Catalog deleted successfully" });
+    return res.json({ message: 'Catalog deleted successfully' });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
