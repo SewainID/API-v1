@@ -62,11 +62,11 @@ const createCatalogs = async (req, res) => {
 
 // Update a catalog
 const updateCatalogs = async (req, res) => {
-  const CatalogUpdate = req.params.id;
+  const catalogUpdate = req.params.id;
   const { name, description, size, price, status, day_rent, day_maintenance } = req.body;
 
   try {
-    const catalog = await Catalog.findByPk(CatalogUpdate);
+    const catalog = await Catalog.findByPk(catalogUpdate);
     if (!catalog) {
       return res.status(404).json({ error: 'Catalog not found' });
     }
@@ -83,7 +83,7 @@ const updateCatalogs = async (req, res) => {
       },
       {
         where: {
-          id,
+          id: catalogUpdate,
         },
       }
     );
@@ -96,16 +96,16 @@ const updateCatalogs = async (req, res) => {
 
 // Delete a catalog
 const deleteCatalogs = async (req, res) => {
-  const CatalogsDelete = req.params.id;
+  const catalogDelete = req.params.id;
   try {
-    const catalog = await Catalog.findByPk(CatalogsDelete);
+    const catalog = await Catalog.findByPk(catalogDelete);
     if (!catalog) {
       return res.status(404).json({ error: 'Catalog not found' });
     }
 
     await Catalog.destroy({
       where: {
-        id,
+        id: catalogDelete,
       },
     });
 
