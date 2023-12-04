@@ -67,12 +67,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Create GCP Credentials File
-        run: |
-          echo ${{ secrets.SA_CREDS_STRING }} | sed 's/\\n/\n/g' > credentials.json
-      - name: log credentials
-        run: |
-          cat credentials.json
       # NOTE: Alternative option - authentication via credentials json
       - name: Google Auth
         id: auth
