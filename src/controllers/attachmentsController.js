@@ -4,8 +4,7 @@ const { Readable } = require('stream');
 // Initialize express and multer
 
 // Initialize GCP Storage
-const storage = new Storage({credentials: JSON.parse(process.env.SA_CREDS)
-});
+const storage = new Storage({ keyFilename: 'credentials.json' });
 const bucket = storage.bucket('sewain');
 
 const attachmentsControllers = (req, res) => {
