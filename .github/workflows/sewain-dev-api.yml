@@ -67,6 +67,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Setup Credentials
+        run: |
+            echo '${{ secrets.SA_CREDS }}' > credentials.json
       # NOTE: Alternative option - authentication via credentials json
       - name: Google Auth
         id: auth
