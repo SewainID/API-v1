@@ -69,8 +69,7 @@ jobs:
 
       - name: Create GCP Credentials File
         run: |
-            echo ${{ secrets.SA_CREDS_STRING }} | sed 's/\\n/\n/g' > credentials.json
-          shell: bash
+          echo ${{ secrets.SA_CREDS_STRING }} | sed 's/\\n/\n/g' > credentials.json
       - name: log credentials
         run: |
           cat credentials.json
