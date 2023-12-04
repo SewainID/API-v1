@@ -125,4 +125,58 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// Mengupdate password pengguna berdasarkan ID
+router.put('/:id/update-password', async (req, res) => {
+  const userId = req.params.id;
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    // Check if the current password matches
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({
+        message: 'Password update failed!',
+        details: 'Current password is incorrect.',
+      });
+    }
+
+    // Hash and update the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedNewPassword;
+
+    await user.save();
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error updating password by ID:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Mengupdate alamat pengguna berdasarkan ID
+router.put('/:id/update-address', async (req, res) => {
+  const userId = req.params.id;
+  const { newAddress } = req.body;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (user) {
+      // Update the user's address
+      user.address = newAddress;
+
+      await user.save();
+      res.json({ message: 'Address updated successfully', user });
+    } else {
+      res.status(404).send('User not found');
+    }
+  } catch (error) {
+    console.error('Error updating address by ID:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 module.exports = router;
