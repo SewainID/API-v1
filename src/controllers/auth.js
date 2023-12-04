@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 // const User = require('../../models/UsersModel'); // Assuming User model is defined in models folder
-const {user} = require('../../models'); // Assuming User model is defined in models folder
+const User = require('../../models/UsersModel'); // Assuming User model is defined in models folder
 
 const generateAccessToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
@@ -34,13 +34,13 @@ const register = async (req, res) => {
     const { email, password, username } = req.body;
 
     // Check if the user already exists
-    const existingUser = await user.findOne({ where: { email } });
+    const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: 'Register Failed!', details: 'User already exists' });
     }
 
     // Check if username is already taken
-    const existingUsername = await user.findOne({ where: { username } });
+    const existingUsername = await User.findOne({ where: { username } });
     if (existingUsername) {
       return res.status(400).json({
         message: 'Register Failed!',
@@ -52,7 +52,7 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10); // 10 is the saltRounds
 
     // Create a new user
-    const newUser = await user.create({
+    const newUser = await User.create({
       email,
       password: hashedPassword,
       username,
@@ -87,7 +87,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     // Check if the user exists
-    const user = await user.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email } });
     if (!user) {
       return res.status(400).json({
         message: 'Login Failed!',
