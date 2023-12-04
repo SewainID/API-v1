@@ -25,29 +25,20 @@ const User = sequelize.define(
       allowNull: false,
       unique: true,
     },
-    detail_users_id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+    created_at: {
+      type: DataTypes.DATE,
       allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
     updated_at: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-    },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    refresh_token: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
     },
   },
 
   {
     tableName: 'users',
-    timestamps: false, // Jika tidak ada kolom created_at dan updated_at
   }
 );
 
