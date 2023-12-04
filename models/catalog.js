@@ -1,30 +1,47 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class Catalog extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
+// models/catalog.js
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database'); // Assuming you have a separate file for Sequelize configuration
+
+const Catalog = sequelize.define(
+  'Catalog',
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+    },
+    size: {
+      type: DataTypes.STRING,
+    },
+    price: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    day_rent: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    day_maintenance: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  },
+  {
+    tableName: 'catalogs', // Assuming you want to name your table 'catalogs'
+    timestamps: true, // If you want timestamps (createdAt, updatedAt)
   }
-  Catalog.init({
-    id: DataTypes.STRING,
-    name: DataTypes.STRING,
-    description: DataTypes.STRING,
-    size: DataTypes.STRING,
-    price: DataTypes.INTEGER,
-    status: DataTypes.STRING,
-    day_rent: DataTypes.INTEGER,
-    day_maintenance: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'Catalog',
-  });
-  return Catalog;
-};
+);
+
+module.exports = Catalog;
