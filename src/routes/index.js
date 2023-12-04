@@ -6,6 +6,11 @@ const { auth } = require('../middleware/auth');
 const userController = require('../controllers/Users');
 const { login, register } = require('../controllers/auth');
 const catalogController = require('../controllers/catalogController'); // Tambahkan ini
+const {attachmentsControllers} = require('../controllers/attachmentsController');
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 
 // Endpoint untuk mendapatkan versi
 router.get('/version', getVersion);
@@ -32,4 +37,5 @@ router.post('/catalogs', catalogController.createCatalogs);
 router.put('/catalogs/:id', catalogController.updateCatalogs);
 router.delete('/catalogs/:id', catalogController.deleteCatalogs);
 
+router.post('/attachments',upload.single('file'), attachmentsControllers);
 module.exports = router;
