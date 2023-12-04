@@ -40,7 +40,6 @@ const Catalog = sequelize.define(
   },
   {
     tableName: 'catalogs', // Assuming you want to name your table 'catalogs'
-    timestamps: true, // If you want timestamps (createdAt, updatedAt)
   }
 );
 
