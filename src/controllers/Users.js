@@ -106,25 +106,33 @@ router.delete('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const userId = req.params.id;
   const { username, password, email, detail_users_id } = req.body;
+
   try {
     const user = await User.findByPk(userId);
-    if (user) {
-      user.username = username;
-      user.password = password;
-      user.email = email;
-      user.detail_users_id = detail_users_id;
-
-      await user.save();
-      res.json(user);
-    } else {
-      res.status(404).send('User not found');
+    if (!user) {
+      return res.status(404).send('User not found');
     }
+
+    // Update only if the fields are provided in the request body
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (detail_users_id) user.detail_users_id = detail_users_id;
+
+    // Update password if provided
+    if (password) {
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
+    }
+
+    // Save the changes
+    await user.save();
+    res.json(user);
   } catch (error) {
     console.error('Error updating user by ID:', error);
     res.status(500).send('Internal Server Error');
   }
 });
-
 // Mengupdate password pengguna berdasarkan ID
 router.put('/:id/update-password', async (req, res) => {
   const userId = req.params.id;
