@@ -69,9 +69,9 @@ jobs:
 
       - name: Create GCP Credentials File
         run: |
-            echo '${{ secrets.SA_CREDS }}' > credentials.json
-          env:
-            SA_CREDS: ${{ secrets.SA_CREDS }}
+          echo '${{ secrets.SA_CREDS }}' > credentials.json
+        env:
+          SA_CREDS: ${{ secrets.SA_CREDS }}
       # NOTE: Alternative option - authentication via credentials json
       - name: Google Auth
         id: auth
