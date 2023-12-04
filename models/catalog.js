@@ -1,6 +1,6 @@
 // models/catalog.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Assuming you have a separate file for Sequelize configuration
+const { sequelize } = require('../config/dbConfig'); // Assuming you have a separate file for Sequelize configuration
 
 const Catalog = sequelize.define(
   'Catalog',
