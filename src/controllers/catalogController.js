@@ -1,10 +1,11 @@
 const Catalog = require('../../models/catalog');
 const Joi = require('joi');
+const {getPaginatedResult} = require("../utils/pagination");
 
 // Get all catalogs
 const getAllCatalogs = async (req, res) => {
   try {
-    const catalogs = await Catalog.findAll();
+    const catalogs = getPaginatedResult(req, res, Catalog)
     return res.json(catalogs);
   } catch (error) {
     return res.status(500).json({ error: error.message });
