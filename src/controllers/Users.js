@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../../models/UsersModel');
-require('dotenv').config();
-const { authenticateToken } = require('../middleware/auth');
+const bcrypt = require('bcrypt');
 
 // Mendapatkan semua pengguna
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
   try {
     const users = await User.findAll();
     res.json(users);
@@ -134,29 +133,22 @@ router.put('/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
-// Endpoint to update password with JWT authentication
-router.put('/:id/update-password', authenticateToken, async (req, res) => {
-  const userIdFromToken = req.user.id;
-
-  // Ensure that the user can only update their own password
-  if (userIdFromToken !== req.params.id) {
-    return res.status(403).json({ error: 'Access forbidden! You can only update your own password.' });
-  }
-
+// Mengupdate password pengguna berdasarkan ID
+router.put('/:id/update-password', async (req, res) => {
+  const userId = req.params.id;
   const { currentPassword, newPassword } = req.body;
 
   try {
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findByPk(userId);
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).send('User not found');
     }
 
     // Check if the current password matches
     const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({
-        error: 'Password update failed!',
+        message: 'Password update failed!',
         details: 'Current password is incorrect.',
       });
     }
@@ -169,10 +161,30 @@ router.put('/:id/update-password', authenticateToken, async (req, res) => {
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
     console.error('Error updating password by ID:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).send('Internal Server Error');
   }
 });
 
+// Mengupdate alamat pengguna berdasarkan ID
+router.put('/:id/update-address', async (req, res) => {
+  const userId = req.params.id;
+  const { newAddress } = req.body;
 
+  try {
+    const user = await User.findByPk(userId);
+    if (user) {
+      // Update the user's address
+      user.address = newAddress;
+
+      await user.save();
+      res.json({ message: 'Address updated successfully', user });
+    } else {
+      res.status(404).send('User not found');
+    }
+  } catch (error) {
+    console.error('Error updating address by ID:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 module.exports = router;
