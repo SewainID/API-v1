@@ -1,11 +1,21 @@
 const Catalog = require('../../models/catalog');
 const Joi = require('joi');
-const {getPaginatedResult} = require("../utils/pagination");
+const {getPagination, getPagingData} = require("../utils/pagination");
 
 // Get all catalogs
 const getAllCatalogs = async (req, res) => {
   try {
-    const catalogs = getPaginatedResult(req, res, Catalog)
+    const page = parseInt(req.query.page || 1);
+    const size = parseInt(req.query.per_page || 20);
+
+    const {limit, offset} = getPagination(page, size);
+    const data = await Catalog.findAndCountAll({
+      limit,
+      offset,
+      where: {}
+    });
+
+    const catalogs = getPagingData(data, page, limit)
     return res.json(catalogs);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -63,11 +73,11 @@ const createCatalogs = async (req, res) => {
 
 // Update a catalog
 const updateCatalogs = async (req, res) => {
-  const catalogUpdate = req.params.id;
+  const CatalogUpdate = req.params.id;
   const { name, description, size, price, status, day_rent, day_maintenance } = req.body;
 
   try {
-    const catalog = await Catalog.findByPk(catalogUpdate);
+    const catalog = await Catalog.findByPk(CatalogUpdate);
     if (!catalog) {
       return res.status(404).json({ error: 'Catalog not found' });
     }
@@ -84,7 +94,7 @@ const updateCatalogs = async (req, res) => {
       },
       {
         where: {
-          id: catalogUpdate,
+          id,
         },
       }
     );
@@ -97,16 +107,16 @@ const updateCatalogs = async (req, res) => {
 
 // Delete a catalog
 const deleteCatalogs = async (req, res) => {
-  const catalogDelete = req.params.id;
+  const CatalogsDelete = req.params.id;
   try {
-    const catalog = await Catalog.findByPk(catalogDelete);
+    const catalog = await Catalog.findByPk(CatalogsDelete);
     if (!catalog) {
       return res.status(404).json({ error: 'Catalog not found' });
     }
 
     await Catalog.destroy({
       where: {
-        id: catalogDelete,
+        id,
       },
     });
 
