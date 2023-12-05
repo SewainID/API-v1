@@ -1,6 +1,6 @@
 const Catalog = require('../../models/catalog');
 const Joi = require('joi');
-const {getPagination, getPagingData} = require("../utils/pagination");
+const { getPagination, getPagingData } = require('../utils/pagination');
 
 // Get all catalogs
 const getAllCatalogs = async (req, res) => {
@@ -8,14 +8,14 @@ const getAllCatalogs = async (req, res) => {
     const page = parseInt(req.query.page || 1);
     const size = parseInt(req.query.per_page || 20);
 
-    const {limit, offset} = getPagination(page, size);
+    const { limit, offset } = getPagination(page, size);
     const data = await Catalog.findAndCountAll({
       limit,
       offset,
-      where: {}
+      where: {},
     });
 
-    const catalogs = getPagingData(data, page, limit)
+    const catalogs = getPagingData(data, page, limit);
     return res.json(catalogs);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -24,9 +24,9 @@ const getAllCatalogs = async (req, res) => {
 
 // Get catalog by ID
 const getCatalogByid = async (req, res) => {
-  const CatalogByid = req.params.id;
+  const catalogById = req.params.id;
   try {
-    const catalog = await Catalog.findByPk(CatalogByid);
+    const catalog = await Catalog.findByPk(catalogById);
     if (!catalog) {
       return res.status(404).json({ error: 'Catalog not found' });
     }
@@ -38,9 +38,9 @@ const getCatalogByid = async (req, res) => {
 
 // Create a new catalog
 const createCatalogs = async (req, res) => {
-  const { name, description, size, price, status, day_rent, day_maintenance } = req.body;
+  const { name, description, size, price, status, day_rent, day_maintenance, photo_url } = req.body;
 
-  const Catalogschema = Joi.object({
+  const CatalogSchema = Joi.object({
     name: Joi.string().required(),
     description: Joi.string(),
     size: Joi.string(),
@@ -48,15 +48,16 @@ const createCatalogs = async (req, res) => {
     status: Joi.string().required(),
     day_rent: Joi.number().required(),
     day_maintenance: Joi.number().required(),
+    photo_url: Joi.string(), // Add photo_url validation
   });
 
-  const { error } = Catalogschema.validate(req.body);
+  const { error } = CatalogSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
   }
 
   try {
-    const newCatalogs = await Catalog.create({
+    const newCatalog = await Catalog.create({
       name,
       description,
       size,
@@ -64,8 +65,9 @@ const createCatalogs = async (req, res) => {
       status,
       day_rent,
       day_maintenance,
+      photo_url,
     });
-    return res.status(201).json(newCatalogs);
+    return res.status(201).json(newCatalog);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -73,11 +75,11 @@ const createCatalogs = async (req, res) => {
 
 // Update a catalog
 const updateCatalogs = async (req, res) => {
-  const CatalogUpdate = req.params.id;
-  const { name, description, size, price, status, day_rent, day_maintenance } = req.body;
+  const catalogUpdateId = req.params.id;
+  const { name, description, size, price, status, day_rent, day_maintenance, photo_url } = req.body;
 
   try {
-    const catalog = await Catalog.findByPk(CatalogUpdate);
+    const catalog = await Catalog.findByPk(catalogUpdateId);
     if (!catalog) {
       return res.status(404).json({ error: 'Catalog not found' });
     }
@@ -91,10 +93,11 @@ const updateCatalogs = async (req, res) => {
         status,
         day_rent,
         day_maintenance,
+        photo_url,
       },
       {
         where: {
-          id,
+          id: catalogUpdateId,
         },
       }
     );
@@ -107,16 +110,16 @@ const updateCatalogs = async (req, res) => {
 
 // Delete a catalog
 const deleteCatalogs = async (req, res) => {
-  const CatalogsDelete = req.params.id;
+  const catalogDeleteId = req.params.id;
   try {
-    const catalog = await Catalog.findByPk(CatalogsDelete);
+    const catalog = await Catalog.findByPk(catalogDeleteId);
     if (!catalog) {
       return res.status(404).json({ error: 'Catalog not found' });
     }
 
     await Catalog.destroy({
       where: {
-        id,
+        id: catalogDeleteId,
       },
     });
 

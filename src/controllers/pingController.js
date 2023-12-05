@@ -1,4 +1,4 @@
-const ping = (req, res) => {
+const ping = (_req, res) => {
   res.json({ message: 'Ping!' });
 };
 

@@ -1,4 +1,4 @@
-const getVersion = (req, res) => {
+const getVersion = (_req, res) => {
   res.json({ version: '1.0.0' });
 };
 

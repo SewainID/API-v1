@@ -1,6 +1,6 @@
 // models/catalog.js
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/dbConfig'); // Assuming you have a separate file for Sequelize configuration
+const { sequelize } = require('../config/dbConfig');
 
 const Catalog = sequelize.define(
   'Catalog',
@@ -37,9 +37,12 @@ const Catalog = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    photo_url: {
+      type: DataTypes.STRING,
+    },
   },
   {
-    tableName: 'catalogs', // Assuming you want to name your table 'catalogs'
+    tableName: 'catalogs',
   }
 );
 

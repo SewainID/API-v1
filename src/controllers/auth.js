@@ -1,19 +1,18 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
-// const User = require('../../models/UsersModel'); // Assuming User model is defined in models folder
-const User = require('../../models/UsersModel'); // Assuming User model is defined in models folder
+const User = require('../../models/UsersModel');
 
 const generateAccessToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
-    expiresIn: '1h', // Token expiration time
+    expiresIn: '1h',
   });
 };
 
 const registerSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
-  username: Joi.string().min(3).max(20).required(), // Set minimum and maximum username length
+  username: Joi.string().min(3).max(20).required(),
 });
 
 const loginSchema = Joi.object({
@@ -49,7 +48,7 @@ const register = async (req, res) => {
     }
 
     // Hash the password before saving it
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the saltRounds
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create a new user
     const newUser = await User.create({
