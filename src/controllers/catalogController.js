@@ -49,7 +49,6 @@ const createCatalogs = async (req, res) => {
     day_rent: Joi.number().required(),
     day_maintenance: Joi.number().required(),
     photo_url: Joi.string(),
-    shop_id: Joi.string().required(),
   });
 
   const { error } = CatalogSchema.validate(req.body);
