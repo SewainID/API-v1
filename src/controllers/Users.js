@@ -3,13 +3,11 @@ const router = express.Router();
 const User = require('../../models/Users');
 const bcrypt = require('bcrypt');
 
-// Mendapatkan semua pengguna
 router.get('/', async (req, res) => {
   try {
     const users = await User.findAll();
 
     if (users.length > 0) {
-      // Map through the users array to extract necessary user details
       const formattedUsers = users.map((user) => ({
         id: user.id,
         username: user.username,
@@ -23,17 +21,15 @@ router.get('/', async (req, res) => {
         results: formattedUsers,
       });
     } else {
-      // Return a 404 status if no users are found
       return res.status(404).json({ message: 'Users not found' });
     }
   } catch (error) {
     console.error('Error retrieving users:', error);
-    // Return a 500 status for any internal server errors
+
     return res.status(500).send('Internal Server Error');
   }
 });
 
-// Mendapatkan pengguna berdasarkan ID
 router.get('/:id', async (req, res) => {
   const userId = req.params.id;
   try {
@@ -58,12 +54,10 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Menambahkan pengguna baru atau melakukan registrasi pengguna
 router.post('/', async (req, res) => {
   try {
     const { id, username, password, email, detail_users_id } = req.body;
 
-    // Check if the request body contains the necessary information for registration
     if (email && password && username) {
       // Cek apakah username atau email sudah digunakan
       const existingUser = await User.findOne({ where: { email } });
@@ -75,10 +69,8 @@ router.post('/', async (req, res) => {
         });
       }
 
-      // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Simpan user ke database dengan password yang di-hash
       const newUser = await User.create({
         username,
         email,
@@ -97,7 +89,6 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // If the necessary information for registration is not provided, proceed with creating a new user
     const newUser = await User.create({
       id,
       username,
@@ -113,7 +104,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Menghapus pengguna berdasarkan ID
 router.delete('/:id', async (req, res) => {
   const userId = req.params.id;
   try {
@@ -130,7 +120,6 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Mengupdate pengguna berdasarkan ID
 router.put('/:id', async (req, res) => {
   const userId = req.params.id;
   const { username, password, email, detail_users_id } = req.body;
@@ -141,19 +130,16 @@ router.put('/:id', async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    // Update only if the fields are provided in the request body
     if (username) user.username = username;
     if (email) user.email = email;
     if (detail_users_id) user.detail_users_id = detail_users_id;
 
-    // Update password if provided
     if (password) {
       // Hash the new password
       const hashedPassword = await bcrypt.hash(password, 10);
       user.password = hashedPassword;
     }
 
-    // Save the changes
     await user.save();
     res.status(201).json({
       message: 'User updated successfully',
@@ -169,7 +155,7 @@ router.put('/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-// Mengupdate password pengguna berdasarkan ID
+
 router.put('/:id/update-password', async (req, res) => {
   const userId = req.params.id;
   const { currentPassword, newPassword } = req.body;
@@ -180,7 +166,6 @@ router.put('/:id/update-password', async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    // Check if the current password matches
     const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({
@@ -189,7 +174,6 @@ router.put('/:id/update-password', async (req, res) => {
       });
     }
 
-    // Hash and update the new password
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedNewPassword;
 
@@ -201,7 +185,6 @@ router.put('/:id/update-password', async (req, res) => {
   }
 });
 
-// Mengupdate alamat pengguna berdasarkan ID
 router.put('/:id/update-address', async (req, res) => {
   const userId = req.params.id;
   const { newAddress } = req.body;
@@ -209,9 +192,7 @@ router.put('/:id/update-address', async (req, res) => {
   try {
     const user = await User.findByPk(userId);
     if (user) {
-      // Update the user's address
       user.address = newAddress;
-
       await user.save();
       res.json({ message: 'Address updated successfully', user });
     } else {

@@ -7,34 +7,30 @@ const userController = require('../controllers/Users');
 const { login, register } = require('../controllers/auth');
 const catalogController = require('../controllers/catalogController');
 const { attachmentsControllers } = require('../controllers/attachmentsController');
+const detailShopController = require('../controllers/detailshopController');
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// Endpoint untuk mendapatkan versi
 router.get('/version', getVersion);
-
-// Endpoint untuk ping
 router.get('/ping', ping);
-
-// Endpoint yang dilindungi dengan autentikasi
 router.get('/protected', auth, ping);
-
-// Endpoint untuk manajemen pengguna
 router.use('/users', userController);
-
-// Endpoint untuk registrasi pengguna baru
 router.post('/register', register);
-
-// Endpoint untuk login
 router.post('/login', login);
 
-// Endpoint untuk Catalog
 router.get('/catalogs', catalogController.getAllCatalogs);
 router.get('/catalogs/:id', catalogController.getCatalogByid);
 router.post('/catalogs', catalogController.createCatalogs);
 router.put('/catalogs/:id', catalogController.updateCatalogs);
 router.delete('/catalogs/:id', catalogController.deleteCatalogs);
 
+router.get('/detail-shops', detailShopController.getAllShops);
+router.get('/detail-shops/:id', detailShopController.getDetailShopById);
+router.post('/detail-shops', detailShopController.createDetailShop);
+router.put('/detail-shops/:id', detailShopController.updateDetailShop);
+router.delete('/detail-shops/:id', detailShopController.deleteDetailShop);
+
 router.post('/attachments', upload.single('file'), attachmentsControllers);
+
 module.exports = router;

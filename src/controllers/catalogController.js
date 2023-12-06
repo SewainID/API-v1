@@ -2,7 +2,6 @@ const Catalog = require('../../models/catalog');
 const Joi = require('joi');
 const { getPagination, getPagingData } = require('../utils/pagination');
 
-// Get all catalogs
 const getAllCatalogs = async (req, res) => {
   try {
     const page = parseInt(req.query.page || 1);
@@ -22,7 +21,6 @@ const getAllCatalogs = async (req, res) => {
   }
 };
 
-// Get catalog by ID
 const getCatalogByid = async (req, res) => {
   const catalogById = req.params.id;
   try {
@@ -36,7 +34,6 @@ const getCatalogByid = async (req, res) => {
   }
 };
 
-// Create a new catalog
 const createCatalogs = async (req, res) => {
   const { name, description, size, price, status, day_rent, day_maintenance, photo_url, shop_id } = req.body;
 
@@ -74,7 +71,6 @@ const createCatalogs = async (req, res) => {
   }
 };
 
-// Update a catalog
 const updateCatalogs = async (req, res) => {
   const catalogUpdateId = req.params.id;
   const { name, description, size, price, status, day_rent, day_maintenance, photo_url, shop_id } = req.body;
@@ -110,7 +106,6 @@ const updateCatalogs = async (req, res) => {
   }
 };
 
-// Delete a catalog
 const deleteCatalogs = async (req, res) => {
   const catalogDeleteId = req.params.id;
   try {
