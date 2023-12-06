@@ -1,7 +1,6 @@
-// models/catalog.js
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/dbConfig');
-const DetailShop = require('./detailshop');
+const DetailShop = require('./detailshopModels');
 
 const Catalog = sequelize.define(
   'Catalog',

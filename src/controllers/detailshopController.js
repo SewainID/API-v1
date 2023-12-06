@@ -1,4 +1,4 @@
-const DetailShop = require('../../models/detailshop');
+const DetailShop = require('../../models/detailshopModels');
 const Joi = require('joi');
 const { getPagination, getPagingData } = require('../utils/pagination');
 
