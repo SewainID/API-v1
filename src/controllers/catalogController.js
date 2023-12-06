@@ -38,7 +38,7 @@ const getCatalogByid = async (req, res) => {
 
 // Create a new catalog
 const createCatalogs = async (req, res) => {
-  const { name, description, size, price, status, day_rent, day_maintenance, photo_url } = req.body;
+  const { name, description, size, price, status, day_rent, day_maintenance, photo_url, shop_id } = req.body;
 
   const CatalogSchema = Joi.object({
     name: Joi.string().required(),
@@ -48,7 +48,8 @@ const createCatalogs = async (req, res) => {
     status: Joi.string().required(),
     day_rent: Joi.number().required(),
     day_maintenance: Joi.number().required(),
-    photo_url: Joi.string(), // Add photo_url validation
+    photo_url: Joi.string(),
+    shop_id: Joi.string().required(),
   });
 
   const { error } = CatalogSchema.validate(req.body);
@@ -66,6 +67,7 @@ const createCatalogs = async (req, res) => {
       day_rent,
       day_maintenance,
       photo_url,
+      shop_id,
     });
     return res.status(201).json(newCatalog);
   } catch (error) {
@@ -76,7 +78,7 @@ const createCatalogs = async (req, res) => {
 // Update a catalog
 const updateCatalogs = async (req, res) => {
   const catalogUpdateId = req.params.id;
-  const { name, description, size, price, status, day_rent, day_maintenance, photo_url } = req.body;
+  const { name, description, size, price, status, day_rent, day_maintenance, photo_url, shop_id } = req.body;
 
   try {
     const catalog = await Catalog.findByPk(catalogUpdateId);
@@ -94,6 +96,7 @@ const updateCatalogs = async (req, res) => {
         day_rent,
         day_maintenance,
         photo_url,
+        shop_id,
       },
       {
         where: {

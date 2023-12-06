@@ -11,6 +11,14 @@ const Catalog = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
+    shop_id: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: DetailShop,
+        key: 'id',
+      },
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,

@@ -1,6 +1,6 @@
 // user.model.cjs
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/dbConfig'); // Sesuaikan dengan file konfigurasi database Anda
+const { sequelize } = require('../config/dbConfig');
 
 const User = sequelize.define(
   'User',

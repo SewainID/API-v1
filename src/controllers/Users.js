@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../../models/UsersModel');
+const User = require('../../models/Users');
 const bcrypt = require('bcrypt');
 
 // Mendapatkan semua pengguna
@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
 
     if (users.length > 0) {
       // Map through the users array to extract necessary user details
-      const formattedUsers = users.map(user => ({
+      const formattedUsers = users.map((user) => ({
         id: user.id,
         username: user.username,
         email: user.email,
