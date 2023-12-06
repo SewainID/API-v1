@@ -14,7 +14,8 @@ const Catalog = sequelize.define(
     },
     shop_id: {
       type: DataTypes.UUID,
-      allowNull: true,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
       references: {
         model: DetailShop,
         key: 'id',
