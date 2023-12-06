@@ -6,8 +6,9 @@ const bcrypt = require('bcrypt');
 // Mendapatkan semua pengguna
 router.get('/', async (req, res) => {
   try {
-    const users = await User.findAll(users);
-    res.status(200).json({
+    const users = await User.findAll();
+    if (users) {
+    return res.status(200).json({
       message: 'Success Get All Users',
       results: {
         id: users.id,
@@ -17,6 +18,9 @@ router.get('/', async (req, res) => {
         updated_at: users.updated_at,
       }, 
     });
+  } else {
+    res.status(404).send('Users not found');
+  }
   } catch (error) {
     console.error('Error retrieving users:', error);
     res.status(500).send('Internal Server Error');
