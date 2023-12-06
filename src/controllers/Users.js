@@ -7,23 +7,29 @@ const bcrypt = require('bcrypt');
 router.get('/', async (req, res) => {
   try {
     const users = await User.findAll();
-    if (users) {
-    return res.status(200).json({
-      message: 'Success Get All Users',
-      results: {
-        id: users.id,
-        username: users.username,
-        email: users.email,
-        created_at: users.created_at,
-        updated_at: users.updated_at,
-      }, 
-    });
-  } else {
-    res.status(404).send('Users not found');
-  }
+
+    if (users.length > 0) {
+      // Map through the users array to extract necessary user details
+      const formattedUsers = users.map(user => ({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+      }));
+
+      return res.status(200).json({
+        message: 'Success Get All Users',
+        results: formattedUsers,
+      });
+    } else {
+      // Return a 404 status if no users are found
+      return res.status(404).json({ message: 'Users not found' });
+    }
   } catch (error) {
     console.error('Error retrieving users:', error);
-    res.status(500).send('Internal Server Error');
+    // Return a 500 status for any internal server errors
+    return res.status(500).send('Internal Server Error');
   }
 });
 
