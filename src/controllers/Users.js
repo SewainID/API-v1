@@ -7,7 +7,16 @@ const bcrypt = require('bcrypt');
 router.get('/', async (req, res) => {
   try {
     const users = await User.findAll();
-    res.json(users);
+    res.status(200).json({
+      message: 'Success Get All Users',
+      results: {
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        created_at: users.created_at,
+        updated_at: users.updated_at,
+      }, 
+    });
   } catch (error) {
     console.error('Error retrieving users:', error);
     res.status(500).send('Internal Server Error');
@@ -20,7 +29,16 @@ router.get('/:id', async (req, res) => {
   try {
     const user = await User.findByPk(userId);
     if (user) {
-      res.json(user);
+      return res.status(200).json({
+        message: 'Success Get User By ID',
+        results: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          created_at: user.created_at,
+          updated_at: user.updated_at,
+        },
+      });
     } else {
       res.status(404).send('User not found');
     }
@@ -127,7 +145,15 @@ router.put('/:id', async (req, res) => {
 
     // Save the changes
     await user.save();
-    res.json(user);
+    res.status(201).json({
+      message: 'User updated successfully',
+      results: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        updated_at: user.updated_at,
+      },
+    });
   } catch (error) {
     console.error('Error updating user by ID:', error);
     res.status(500).send('Internal Server Error');
