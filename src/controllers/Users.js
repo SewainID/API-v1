@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 // Mendapatkan semua pengguna
 router.get('/', async (req, res) => {
   try {
-    const users = await User.findAll(User);
+    const users = await User.findAll(users);
     res.status(200).json({
       message: 'Success Get All Users',
       results: {
