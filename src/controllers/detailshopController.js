@@ -1,8 +1,7 @@
-const DetailShop = require('../controllers/detailshopController');
+const DetailShop = require('../../models/detailshop');
 const Joi = require('joi');
 const { getPagination, getPagingData } = require('../utils/pagination');
 
-// Get all shops
 const getAllShops = async (req, res) => {
   try {
     const page = parseInt(req.query.page || 1);
@@ -22,7 +21,6 @@ const getAllShops = async (req, res) => {
   }
 };
 
-// Get detail shop by ID
 const getDetailShopById = async (req, res) => {
   const detailShopId = req.params.id;
   try {
@@ -36,7 +34,6 @@ const getDetailShopById = async (req, res) => {
   }
 };
 
-// Create a new detail shop
 const createDetailShop = async (req, res) => {
   const { name, username } = req.body;
 
@@ -61,7 +58,6 @@ const createDetailShop = async (req, res) => {
   }
 };
 
-// Update a detail shop
 const updateDetailShop = async (req, res) => {
   const detailShopUpdateId = req.params.id;
   const { name, username } = req.body;
@@ -90,7 +86,6 @@ const updateDetailShop = async (req, res) => {
   }
 };
 
-// Delete a detail shop
 const deleteDetailShop = async (req, res) => {
   const detailShopDeleteId = req.params.id;
   try {
