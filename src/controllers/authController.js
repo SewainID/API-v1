@@ -35,15 +35,15 @@ const register = async (req, res) => {
     // Check if the user already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ message: 'Register Failed!', details: 'User already exists' });
+      return res.status(400).json({ message: 'Register Failed!', details: 'Email already exists' });
     }
 
-    // Check if username is already taken
+    // Check if username is already exists
     const existingUsername = await User.findOne({ where: { username } });
     if (existingUsername) {
       return res.status(400).json({
         message: 'Register Failed!',
-        details: 'Username already taken',
+        details: 'Username already exists',
       });
     }
 
@@ -80,7 +80,7 @@ const login = async (req, res) => {
     if (error) {
       return res.status(400).json({
         message: 'Login Failed!',
-        details: 'username or password is incorrect',
+        details: error.details[0].message,
       });
     }
 
@@ -91,7 +91,7 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         message: 'Login Failed!',
-        details: 'username length min ... username already taken dll',
+        details: 'Email not found',
       });
     }
 
@@ -100,7 +100,7 @@ const login = async (req, res) => {
     if (!validPassword) {
       return res.status(400).json({
         message: 'Login Failed!',
-        details: 'username or password is incorrect',
+        details: 'Password is incorrect',
       });
     }
 

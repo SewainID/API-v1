@@ -9,7 +9,7 @@ exports.auth = (req, res, next) => {
   }
 
   try {
-    req.user = jwt.verify(token, 'PisangGoreng720' || process.env.TOKEN_KEY); //verified token
+    req.user = jwt.verify(token, process.env.TOKEN_KEY);
     next();
   } catch (error) {
     res.status(400).send({ message: 'Invalid token' });
