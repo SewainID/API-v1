@@ -1,17 +1,19 @@
 const Catalog = require('../../models/catalogModels');
+const DetailShop = require('../../models/detailshopModels');
 const Joi = require('joi');
-const { getPagination, getPagingData } = require('../utils/pagination');
+const { getPagination, getPagingData, parseQueryParams} = require('../utils/pagination');
 
 const getAllCatalogs = async (req, res) => {
   try {
     const page = parseInt(req.query.page || 1);
     const size = parseInt(req.query.per_page || 20);
-
+    const queryParams = parseQueryParams(req.query)
     const { limit, offset } = getPagination(page, size);
     const data = await Catalog.findAndCountAll({
       limit,
       offset,
-      where: {},
+      ...queryParams,
+    include: [{model : DetailShop, as : 'shop'}]
     });
 
     const catalogs = getPagingData(data, page, limit);
