@@ -130,12 +130,25 @@ router.put('/:id', async (req, res) => {
       return res.status(404).send('User not found');
     }
 
+    if (username && username !== user.username) {
+      const existingUsernameUser = await User.findOne({ where: { username } });
+      if (existingUsernameUser) {
+        return res.status(400).json({ message: 'Username already exists for another user' });
+      }
+    }
+
+    if (email && email !== user.email) {
+      const existingEmailUser = await User.findOne({ where: { email } });
+      if (existingEmailUser) {
+        return res.status(400).json({ message: 'Email already exists for another user' });
+      }
+    }
+
     if (username) user.username = username;
     if (email) user.email = email;
     if (detail_users_id) user.detail_users_id = detail_users_id;
 
     if (password) {
-      // Hash the new password
       const hashedPassword = await bcrypt.hash(password, 10);
       user.password = hashedPassword;
     }
