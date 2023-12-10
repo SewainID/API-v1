@@ -1,31 +1,39 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../../models/UsersModels');
-const bcrypt = require('bcrypt');
+const DetailsUsers = require('../../models/detailusersModels');
+const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
 
 router.get('/', async (req, res) => {
   try {
-    const users = await User.findAll();
+    const page = parseInt(req.query.page || 1);
+    const size = parseInt(req.query.per_page || 20);
+    const queryParams = parseQueryParams(req.query);
+    const { limit, offset } = getPagination(page, size);
 
-    if (users.length > 0) {
-      const formattedUsers = users.map((user) => ({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-      }));
+    const users = await User.findAndCountAll({
+      limit,
+      offset,
+      ...queryParams,
+      include: [{ model: DetailsUsers, as: 'user' }],
+    });
+    const formattedUsers = users.rows.map((user) => ({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+    }));
 
-      return res.status(200).json({
-        message: 'Success Get All Users',
-        results: formattedUsers,
-      });
-    } else {
-      return res.status(404).json({ message: 'Users not found' });
-    }
+    const pagingData = getPagingData(users, page, limit);
+
+    return res.status(200).json({
+      message: 'Success Get All Users',
+      results: formattedUsers,
+      paging: pagingData,
+    });
   } catch (error) {
     console.error('Error retrieving users:', error);
-
     return res.status(500).send('Internal Server Error');
   }
 });
@@ -36,7 +44,7 @@ router.get('/:id', async (req, res) => {
     const user = await User.findByPk(userId);
     if (user) {
       return res.status(200).json({
-        message: 'Success Get User By ID',
+        message: 'Success Get User',
         results: {
           id: user.id,
           username: user.username,
@@ -46,77 +54,11 @@ router.get('/:id', async (req, res) => {
         },
       });
     } else {
-      res.status(404).send('User not found');
+      return res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
-    console.error('Error retrieving user by ID:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-router.post('/', async (req, res) => {
-  try {
-    const { id, username, password, email, detail_users_id } = req.body;
-
-    if (email && password && username) {
-      // Cek apakah username atau email sudah digunakan
-      const existingUser = await User.findOne({ where: { email } });
-
-      if (existingUser) {
-        return res.status(400).json({
-          message: 'Registration Failed!',
-          details: 'Username or email already taken.',
-        });
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const newUser = await User.create({
-        username,
-        email,
-        password: hashedPassword,
-      });
-
-      return res.status(201).json({
-        message: 'Registration Success!',
-        results: {
-          id: newUser.id,
-          detail_users_id: newUser.detail_users_id,
-          username: newUser.username,
-          email: newUser.email,
-          updated_at: newUser.updated_at,
-        },
-      });
-    }
-
-    const newUser = await User.create({
-      id,
-      username,
-      password,
-      email,
-      detail_users_id,
-    });
-
-    res.status(201).json(newUser);
-  } catch (error) {
-    console.error('Error creating user or registering user:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-router.delete('/:id', async (req, res) => {
-  const userId = req.params.id;
-  try {
-    const user = await User.findByPk(userId);
-    if (user) {
-      await user.destroy();
-      res.send('User deleted successfully');
-    } else {
-      res.status(404).send('User not found');
-    }
-  } catch (error) {
-    console.error('Error deleting user by ID:', error);
-    res.status(500).send('Internal Server Error');
+    console.error('Error retrieving user:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
@@ -133,14 +75,14 @@ router.put('/:id', async (req, res) => {
     if (username && username !== user.username) {
       const existingUsernameUser = await User.findOne({ where: { username } });
       if (existingUsernameUser) {
-        return res.status(400).json({ message: 'Username already exists for another user' });
+        return res.status(400).json({ message: 'Username already exists' });
       }
     }
 
     if (email && email !== user.email) {
       const existingEmailUser = await User.findOne({ where: { email } });
       if (existingEmailUser) {
-        return res.status(400).json({ message: 'Email already exists for another user' });
+        return res.status(400).json({ message: 'Email already exists' });
       }
     }
 
@@ -153,6 +95,7 @@ router.put('/:id', async (req, res) => {
       user.password = hashedPassword;
     }
 
+    user.updated_at = new Date();
     await user.save();
     res.status(201).json({
       message: 'User updated successfully',
@@ -164,7 +107,7 @@ router.put('/:id', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error updating user by ID:', error);
+    console.error('Error updating user:', error);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -179,7 +122,9 @@ router.put('/:id/update-password', async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    const trimmedCurrentPassword = currentPassword.trim();
+
+    const isPasswordValid = await bcrypt.compare(trimmedCurrentPassword, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({
         message: 'Password update failed!',
@@ -187,32 +132,42 @@ router.put('/:id/update-password', async (req, res) => {
       });
     }
 
+    if (trimmedCurrentPassword === newPassword.trim()) {
+      return res.status(400).json({
+        message: 'Password update failed!',
+        details: 'New password must be different from the current password.',
+      });
+    }
+
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedNewPassword;
+    user.updated_at = new Date();
 
     await user.save();
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
-    console.error('Error updating password by ID:', error);
+    console.error('Error updating password:', error);
     res.status(500).send('Internal Server Error');
   }
 });
 
 router.put('/:id/update-address', async (req, res) => {
   const userId = req.params.id;
-  const { newAddress } = req.body;
+  const { Address } = req.body;
 
   try {
     const user = await User.findByPk(userId);
     if (user) {
-      user.address = newAddress;
+      user.address = Address;
+      user.updated_at = new Date();
+
       await user.save();
       res.json({ message: 'Address updated successfully', user });
     } else {
       res.status(404).send('User not found');
     }
   } catch (error) {
-    console.error('Error updating address by ID:', error);
+    console.error('Error updating address:', error);
     res.status(500).send('Internal Server Error');
   }
 });

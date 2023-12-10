@@ -1,21 +1,28 @@
 const DetailShop = require('./detailshopModels');
 const Catalog = require('./catalogModels');
-// Import other models as needed
+const DetailsUsers = require('./detailusersModels');
+const Users = require('./UsersModels');
 
 const setupAssociations = () => {
-    // One-to-One relationship: Each DetailShop has one Catalog
-    DetailShop.hasOne(Catalog, {
-        foreignKey: 'shop_id', // The foreign key in the Catalog model
-        onDelete: 'CASCADE' // Optional: Defines behavior when a DetailShop record is deleted
-    });
+  DetailShop.hasOne(Catalog, {
+    foreignKey: 'shop_id',
+    onDelete: 'CASCADE',
+  });
 
-    // The inverse relationship: Each Catalog belongs to a DetailShop
-    Catalog.belongsTo(DetailShop, {
-        foreignKey: 'shop_id', // This should match the field in the Catalog model
-        as: 'shop'
-    });
+  Catalog.belongsTo(DetailShop, {
+    foreignKey: 'shop_id',
+    as: 'shop',
+  });
 
-    // ... Define other associations here
+  Users.hasOne(DetailsUsers, {
+    foreignKey: 'users_id',
+    onDelete: 'CASCADE',
+  });
+
+  DetailsUsers.belongsTo(Users, {
+    foreignKey: 'users_id',
+    as: 'user',
+  });
 };
 
 module.exports = setupAssociations;
