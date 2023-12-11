@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/dbConfig');
 
 const DetailsUsers = sequelize.define(
-  'details_users',
+  'detail_users',
   {
     id: {
       type: DataTypes.UUID,
@@ -32,20 +32,32 @@ const DetailsUsers = sequelize.define(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       allowNull: true,
+      references: {
+        model: 'social_media_users',
+        key: 'id',
+      },
     },
     address_user_id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       allowNull: true,
+      references: {
+        model: 'address_users',
+        key: 'id',
+      },
     },
     detail_shop_id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       allowNull: true,
+      references: {
+        model: 'detail_shops',
+        key: 'id',
+      },
     },
   },
   {
-    tableName: 'details_users',
+    tableName: 'detail_users',
   }
 );
 
