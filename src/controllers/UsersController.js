@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const DetailsUsers = require('../../models/detailusersModels');
 const User = require('../../models/UsersModels');
+
 const bcrypt = require('bcrypt');
 const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
 
@@ -15,6 +17,7 @@ router.get('/', async (req, res) => {
       limit,
       offset,
       ...queryParams,
+      include: [{ model: DetailsUsers, as: 'user' }],
     });
     const formattedUsers = users.rows.map((user) => ({
       id: user.id,
@@ -124,7 +127,7 @@ router.put('/:id', async (req, res) => {
 
 router.put('/:id/update-password', async (req, res) => {
   const userId = req.params.id;
-  const { currentPassword, newPassword } = req.body;
+  const { currentPassword, newPassword, confirmPassword } = req.body;
 
   try {
     const user = await User.findByPk(userId);
@@ -142,7 +145,7 @@ router.put('/:id/update-password', async (req, res) => {
       });
     }
 
-    const isSamePassword = currentPassword === newPassword.trim();
+    const isSamePassword = newPassword.trim() === confirmPassword.trim();
 
     if (isSamePassword) {
       return res.status(400).json({
@@ -166,12 +169,21 @@ router.put('/:id/update-password', async (req, res) => {
 
 router.put('/:id/update-address', async (req, res) => {
   const userId = req.params.id;
-  const { Address } = req.body;
+  const { address } = req.body;
+
   try {
     const user = await User.findByPk(userId);
+
     if (user) {
-      user.address = Address;
+      user.address = address;
       await user.save();
+
+      const detailsUser = await DetailsUsers.findOne({ where: { users_id: userId } });
+      if (detailsUser) {
+        detailsUser.address = address;
+        await detailsUser.save();
+      }
+
       res.json({ message: 'Address updated successfully', user });
     } else {
       res.status(404).send('User not found');
@@ -181,4 +193,5 @@ router.put('/:id/update-address', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 module.exports = router;
