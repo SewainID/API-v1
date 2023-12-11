@@ -16,7 +16,6 @@ router.get('/', async (req, res) => {
       limit,
       offset,
       ...queryParams,
-      include: [{ model: User, as: 'user' }],
     });
     const formattedUsers = users.rows.map((user) => ({
       id: user.id,
