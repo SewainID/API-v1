@@ -15,16 +15,14 @@ router.get('/', async (req, res) => {
       limit,
       offset,
       ...queryParams,
-      include: [{ model: DetailsUsers, as: 'details_users' }],
+      include: [{ model: DetailsUsers, as: 'detail_users' }],
     });
-
     const formattedUsers = users.rows.map((user) => ({
       id: user.id,
       username: user.username,
       email: user.email,
       created_at: user.created_at,
       updated_at: user.updated_at,
-      details: user.details_users,
     }));
 
     const pagingData = getPagingData(users, page, limit);
@@ -36,6 +34,7 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error retrieving users:', error);
+
     return res.status(500).send('Internal Server Error');
   }
 });
@@ -56,18 +55,33 @@ router.get('/:id', async (req, res) => {
         },
       });
     } else {
-      return res.status(404).json({ message: 'User not found' });
+      res.status(404).send('User not found');
     }
   } catch (error) {
     console.error('Error retrieving user:', error);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const user = await User.findByPk(userId);
+    if (user) {
+      await user.destroy();
+      res.send('User deleted successfully');
+    } else {
+      res.status(404).send('User not found');
+    }
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).send('Internal Server Error');
   }
 });
 
 router.put('/:id', async (req, res) => {
   const userId = req.params.id;
-  const { username, password, email, detail_users_id } = req.body;
-
+  const { username, email, detail_users_id } = req.body;
   try {
     const user = await User.findByPk(userId);
     if (!user) {
@@ -92,11 +106,6 @@ router.put('/:id', async (req, res) => {
     if (email) user.email = email;
     if (detail_users_id) user.detail_users_id = detail_users_id;
 
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      user.password = hashedPassword;
-    }
-
     user.updated_at = new Date();
     await user.save();
     res.status(201).json({
@@ -117,15 +126,12 @@ router.put('/:id', async (req, res) => {
 router.put('/:id/update-password', async (req, res) => {
   const userId = req.params.id;
   const { currentPassword, newPassword } = req.body;
-
   try {
     const user = await User.findByPk(userId);
     if (!user) {
       return res.status(404).send('User not found');
     }
-
     const trimmedCurrentPassword = currentPassword.trim();
-
     const isPasswordValid = await bcrypt.compare(trimmedCurrentPassword, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({
@@ -133,18 +139,15 @@ router.put('/:id/update-password', async (req, res) => {
         details: 'Current password is incorrect.',
       });
     }
-
     if (trimmedCurrentPassword === newPassword.trim()) {
       return res.status(400).json({
         message: 'Password update failed!',
         details: 'New password must be different from the current password.',
       });
     }
-
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedNewPassword;
     user.updated_at = new Date();
-
     await user.save();
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
@@ -152,17 +155,13 @@ router.put('/:id/update-password', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
 router.put('/:id/update-address', async (req, res) => {
   const userId = req.params.id;
   const { Address } = req.body;
-
   try {
     const user = await User.findByPk(userId);
     if (user) {
       user.address = Address;
-      user.updated_at = new Date();
-
       await user.save();
       res.json({ message: 'Address updated successfully', user });
     } else {
@@ -173,5 +172,4 @@ router.put('/:id/update-address', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
 module.exports = router;
