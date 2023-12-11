@@ -1,30 +1,18 @@
 const DetailsUsers = require('../../models/detailusersModels');
 const Joi = require('joi');
 
-const getAllDetailsUsers = async (_req, res) => {
+const getAllDetailsUsers = async (req, res) => {
   try {
     const detailsUsers = await DetailsUsers.findAll();
-    const formattedDetailsUsers = detailsUsers.map((detailsUser) => ({
-      id: detailsUser.id,
-      users_id: detailsUser.users_id,
-      full_name: detailsUser.full_name,
-      number_phone: detailsUser.number_phone,
-      social_media_id: detailsUser.social_media_id,
-      address_user_id: detailsUser.address_user_id,
-      detail_shop_id: detailsUser.detail_shop_id,
-    }));
+    const formattedDetailsUsers = detailsUsers.map(formatDetailsUser);
 
     if (detailsUsers.length > 0) {
-      return res.status(200).json({
-        message: 'Success Get All Details Users',
-        results: formattedDetailsUsers,
-      });
+      sendSuccessResponse(res, 'Success Get All Details Users', formattedDetailsUsers);
     } else {
-      return res.status(404).json({ message: 'Details Users not found' });
+      sendNotFoundResponse(res, 'Details Users not found');
     }
   } catch (error) {
-    console.error('Error retrieving details users:', error);
-    return res.status(500).send('Internal Server Error');
+    handleServerError(res, error);
   }
 };
 
@@ -33,35 +21,25 @@ const getDetailsUserById = async (req, res) => {
   try {
     const detailsUser = await DetailsUsers.findByPk(detailsUserId);
     if (detailsUser) {
-      res.status(200).json({
-        message: 'Success Get Details User',
-        results: detailsUser,
-      });
+      sendSuccessResponse(res, 'Success Get Details User', formatDetailsUser(detailsUser));
     } else {
-      res.status(404).send('Details User not found');
+      sendNotFoundResponse(res, 'Details User not found');
     }
   } catch (error) {
-    console.error('Error retrieving details user:', error);
-    res.status(500).send('Internal Server Error');
+    handleServerError(res, error);
   }
 };
 
 const createDetailsUser = async (req, res) => {
-  const { error } = validateDetailsUser(req.body);
-
-  if (error) {
-    return res.status(400).json({ error: error.details[0].message });
-  }
-
-  const { users_id, full_name, number_phone, social_media_id, address_user_id, detail_shop_id } = req.body;
-
   try {
-    const isFullNameTaken = await DetailsUsers.findOne({
-      where: { full_name },
-    });
+    await validateDetailsUser(req.body);
+
+    const { users_id, full_name, number_phone, social_media_id, address_user_id, detail_shop_id } = req.body;
+    const isFullNameTaken = await DetailsUsers.findOne({ where: { full_name } });
 
     if (isFullNameTaken) {
-      return res.status(400).json({ message: 'Full Name is already taken' });
+      sendClientErrorResponse(res, 'Full Name is already taken');
+      return;
     }
 
     const newDetailsUser = await DetailsUsers.create({
@@ -73,79 +51,23 @@ const createDetailsUser = async (req, res) => {
       detail_shop_id,
     });
 
-    res.status(201).json({
-      message: 'Details User created successfully',
-      results: newDetailsUser,
-    });
+    sendCreatedResponse(res, 'Details User created successfully', formatDetailsUser(newDetailsUser));
   } catch (error) {
-    console.error('Error creating details user:', error);
-    res.status(500).send('Internal Server Error');
+    handleValidationError(res, error);
   }
 };
 
-const updateDetailsUser = async (req, res) => {
-  const { error } = validateDetailsUser(req.body);
+const formatDetailsUser = (detailsUser) => ({
+  id: detailsUser.id,
+  users_id: detailsUser.users_id,
+  full_name: detailsUser.full_name,
+  number_phone: detailsUser.number_phone,
+  social_media_id: detailsUser.social_media_id,
+  address_user_id: detailsUser.address_user_id,
+  detail_shop_id: detailsUser.detail_shop_id,
+});
 
-  if (error) {
-    return res.status(400).json({ error: error.details[0].message });
-  }
-
-  const detailsUserId = req.params.id;
-  const { full_name, number_phone, social_media_id, address_user_id, detail_shop_id } = req.body;
-
-  try {
-    const detailsUser = await DetailsUsers.findByPk(detailsUserId);
-    if (!detailsUser) {
-      return res.status(404).send('Details User not found');
-    }
-
-    if (full_name !== detailsUser.full_name) {
-      const isFullNameTaken = await DetailsUsers.findOne({
-        where: { full_name },
-      });
-
-      if (isFullNameTaken) {
-        return res.status(400).json({ message: 'Full Name is already taken' });
-      }
-    }
-
-    detailsUser.full_name = full_name;
-    detailsUser.number_phone = number_phone;
-    detailsUser.social_media_id = social_media_id;
-    detailsUser.address_user_id = address_user_id;
-    detailsUser.detail_shop_id = detail_shop_id;
-
-    await detailsUser.save();
-
-    res.status(200).json({
-      message: 'Details User updated successfully',
-      results: detailsUser,
-    });
-  } catch (error) {
-    console.error('Error updating details user:', error);
-    res.status(500).send('Internal Server Error');
-  }
-};
-
-const deleteDetailsUser = async (req, res) => {
-  const detailsUserId = req.params.id;
-
-  try {
-    const detailsUser = await DetailsUsers.findByPk(detailsUserId);
-    if (!detailsUser) {
-      return res.status(404).send('Details User not found');
-    }
-
-    await detailsUser.destroy();
-
-    res.status(200).send('Details User deleted successfully');
-  } catch (error) {
-    console.error('Error deleting details user:', error);
-    res.status(500).send('Internal Server Error');
-  }
-};
-
-const validateDetailsUser = (detailsUser) => {
+const validateDetailsUser = async (detailsUser) => {
   const schema = Joi.object({
     users_id: Joi.string().uuid().required(),
     full_name: Joi.string().required(),
@@ -155,13 +77,38 @@ const validateDetailsUser = (detailsUser) => {
     detail_shop_id: Joi.string().uuid().allow(null),
   });
 
-  return schema.validate(detailsUser);
+  await schema.validateAsync(detailsUser);
+};
+
+const sendSuccessResponse = (res, message, results) => {
+  res.status(200).json({ message, results });
+};
+
+const sendNotFoundResponse = (res, message) => {
+  res.status(404).json({ message });
+};
+
+const sendCreatedResponse = (res, message, results) => {
+  res.status(201).json({ message, results });
+};
+
+const sendClientErrorResponse = (res, message) => {
+  res.status(400).json({ message });
+};
+
+const handleValidationError = (res, error) => {
+  res.status(400).json({ error: error.details[0].message });
+};
+
+const handleServerError = (res, error) => {
+  console.error('Internal Server Error:', error);
+  res.status(500).send('Internal Server Error');
 };
 
 module.exports = {
   getAllDetailsUsers,
   getDetailsUserById,
   createDetailsUser,
-  updateDetailsUser,
-  deleteDetailsUser,
+  createDetailsUser,
+  createDetailsUser,
 };

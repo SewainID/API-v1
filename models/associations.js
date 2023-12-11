@@ -4,6 +4,7 @@ const DetailsUsers = require('./detailusersModels');
 const Users = require('./UsersModels');
 
 const setupAssociations = () => {
+  // Association between DetailShop and Catalog
   DetailShop.hasOne(Catalog, {
     foreignKey: 'shop_id',
     onDelete: 'CASCADE',
@@ -14,6 +15,7 @@ const setupAssociations = () => {
     as: 'shop',
   });
 
+  // Association between Users and DetailsUsers
   Users.hasOne(DetailsUsers, {
     foreignKey: 'users_id',
     onDelete: 'CASCADE',
@@ -21,7 +23,7 @@ const setupAssociations = () => {
 
   DetailsUsers.belongsTo(Users, {
     foreignKey: 'users_id',
-    as: 'details_users',
+    as: 'user',
   });
 };
 
