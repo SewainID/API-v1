@@ -32,28 +32,16 @@ const DetailsUsers = sequelize.define(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       allowNull: true,
-      references: {
-        model: 'social_media_users',
-        key: 'id',
-      },
     },
     address_user_id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       allowNull: true,
-      references: {
-        model: 'address_users',
-        key: 'id',
-      },
     },
     detail_shop_id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       allowNull: true,
-      references: {
-        model: 'detail_shops',
-        key: 'id',
-      },
     },
   },
   {
