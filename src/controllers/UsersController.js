@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../../models/UsersModels');
-const DetailsUsers = require('../../models/detailusersModels');
 const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
 
 router.get('/', async (req, res) => {
@@ -15,7 +14,6 @@ router.get('/', async (req, res) => {
       limit,
       offset,
       ...queryParams,
-      include: [{ model: DetailsUsers, as: 'detail_users' }],
     });
     const formattedUsers = users.rows.map((user) => ({
       id: user.id,
@@ -126,35 +124,45 @@ router.put('/:id', async (req, res) => {
 router.put('/:id/update-password', async (req, res) => {
   const userId = req.params.id;
   const { currentPassword, newPassword } = req.body;
+
   try {
     const user = await User.findByPk(userId);
+
     if (!user) {
       return res.status(404).send('User not found');
     }
-    const trimmedCurrentPassword = currentPassword.trim();
-    const isPasswordValid = await bcrypt.compare(trimmedCurrentPassword, user.password);
-    if (!isPasswordValid) {
+
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isCurrentPasswordValid) {
       return res.status(400).json({
         message: 'Password update failed!',
         details: 'Current password is incorrect.',
       });
     }
-    if (trimmedCurrentPassword === newPassword.trim()) {
+
+    const isSamePassword = currentPassword === newPassword.trim();
+
+    if (isSamePassword) {
       return res.status(400).json({
         message: 'Password update failed!',
         details: 'New password must be different from the current password.',
       });
     }
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    const hashedNewPassword = await bcrypt.hash(newPassword.trim(), 10);
     user.password = hashedNewPassword;
     user.updated_at = new Date();
+
     await user.save();
+
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
     console.error('Error updating password:', error);
     res.status(500).send('Internal Server Error');
   }
 });
+
 router.put('/:id/update-address', async (req, res) => {
   const userId = req.params.id;
   const { Address } = req.body;
