@@ -15,14 +15,16 @@ router.get('/', async (req, res) => {
       limit,
       offset,
       ...queryParams,
-      include: [{ model: DetailsUsers, as: 'user' }],
+      include: [{ model: DetailsUsers, as: 'details_users' }],
     });
+
     const formattedUsers = users.rows.map((user) => ({
       id: user.id,
       username: user.username,
       email: user.email,
       created_at: user.created_at,
       updated_at: user.updated_at,
+      details: user.details_users,
     }));
 
     const pagingData = getPagingData(users, page, limit);

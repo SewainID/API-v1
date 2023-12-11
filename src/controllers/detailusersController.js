@@ -1,22 +1,20 @@
-const express = require('express');
-const router = express.Router();
 const DetailsUsers = require('../../models/detailusersModels');
+const Joi = require('joi');
 
-router.get('/', async (_req, res) => {
+const getAllDetailsUsers = async (_req, res) => {
   try {
     const detailsUsers = await DetailsUsers.findAll();
+    const formattedDetailsUsers = detailsUsers.map((detailsUser) => ({
+      id: detailsUser.id,
+      users_id: detailsUser.users_id,
+      full_name: detailsUser.full_name,
+      number_phone: detailsUser.number_phone,
+      social_media_id: detailsUser.social_media_id,
+      address_user_id: detailsUser.address_user_id,
+      detail_shop_id: detailsUser.detail_shop_id,
+    }));
 
     if (detailsUsers.length > 0) {
-      const formattedDetailsUsers = detailsUsers.map((detailsUser) => ({
-        id: detailsUser.id,
-        users_id: detailsUser.users_id,
-        full_name: detailsUser.full_name,
-        number_phone: detailsUser.number_phone,
-        social_media_id: detailsUser.social_media_id,
-        address_user_id: detailsUser.address_user_id,
-        detail_shop_id: detailsUser.detail_shop_id,
-      }));
-
       return res.status(200).json({
         message: 'Success Get All Details Users',
         results: formattedDetailsUsers,
@@ -28,9 +26,9 @@ router.get('/', async (_req, res) => {
     console.error('Error retrieving details users:', error);
     return res.status(500).send('Internal Server Error');
   }
-});
+};
 
-router.get('/:id', async (req, res) => {
+const getDetailsUserById = async (req, res) => {
   const detailsUserId = req.params.id;
   try {
     const detailsUser = await DetailsUsers.findByPk(detailsUserId);
@@ -43,12 +41,18 @@ router.get('/:id', async (req, res) => {
       res.status(404).send('Details User not found');
     }
   } catch (error) {
-    console.error('Error retrieving details user :', error);
+    console.error('Error retrieving details user:', error);
     res.status(500).send('Internal Server Error');
   }
-});
+};
 
-router.post('/', async (req, res) => {
+const createDetailsUser = async (req, res) => {
+  const { error } = validateDetailsUser(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
   const { users_id, full_name, number_phone, social_media_id, address_user_id, detail_shop_id } = req.body;
 
   try {
@@ -77,9 +81,15 @@ router.post('/', async (req, res) => {
     console.error('Error creating details user:', error);
     res.status(500).send('Internal Server Error');
   }
-});
+};
 
-router.put('/:id', async (req, res) => {
+const updateDetailsUser = async (req, res) => {
+  const { error } = validateDetailsUser(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
   const detailsUserId = req.params.id;
   const { full_name, number_phone, social_media_id, address_user_id, detail_shop_id } = req.body;
 
@@ -115,9 +125,9 @@ router.put('/:id', async (req, res) => {
     console.error('Error updating details user:', error);
     res.status(500).send('Internal Server Error');
   }
-});
+};
 
-router.delete('/:id', async (req, res) => {
+const deleteDetailsUser = async (req, res) => {
   const detailsUserId = req.params.id;
 
   try {
@@ -133,6 +143,25 @@ router.delete('/:id', async (req, res) => {
     console.error('Error deleting details user:', error);
     res.status(500).send('Internal Server Error');
   }
-});
+};
 
-module.exports = router;
+const validateDetailsUser = (detailsUser) => {
+  const schema = Joi.object({
+    users_id: Joi.string().uuid().required(),
+    full_name: Joi.string().required(),
+    number_phone: Joi.string().allow(null),
+    social_media_id: Joi.string().uuid().allow(null),
+    address_user_id: Joi.string().uuid().allow(null),
+    detail_shop_id: Joi.string().uuid().allow(null),
+  });
+
+  return schema.validate(detailsUser);
+};
+
+module.exports = {
+  getAllDetailsUsers,
+  getDetailsUserById,
+  createDetailsUser,
+  updateDetailsUser,
+  deleteDetailsUser,
+};

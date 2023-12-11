@@ -21,7 +21,7 @@ const setupAssociations = () => {
 
   DetailsUsers.belongsTo(Users, {
     foreignKey: 'users_id',
-    as: 'user',
+    as: 'details_users',
   });
 };
 

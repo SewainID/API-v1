@@ -25,13 +25,13 @@ const DetailsUsers = sequelize.define(
       unique: true,
     },
     number_phone: {
-      type: DataTypes.INTEGER(20),
+      type: DataTypes.STRING(20),
       allowNull: true,
     },
     social_media_id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'social_media_users',
         key: 'id',
@@ -40,7 +40,7 @@ const DetailsUsers = sequelize.define(
     address_user_id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'address_users',
         key: 'id',
@@ -49,7 +49,7 @@ const DetailsUsers = sequelize.define(
     detail_shop_id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'detail_shops',
         key: 'id',
