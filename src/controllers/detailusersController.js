@@ -1,25 +1,32 @@
-const DetailsUsers = require('../../models/detailusersModels');
+const DetailUsers = require('../../models/detailusersModels');
 const Joi = require('joi');
+const { getPagination, getPagingData } = require('../utils/pagination');
 
 const getAllDetailsUsers = async (req, res) => {
   try {
-    const detailsUsers = await DetailsUsers.findAll();
-    const formattedDetailsUsers = detailsUsers.map(formatDetailsUser);
+    const page = parseInt(req.query.page || 1);
+    const size = parseInt(req.query.per_page || 20);
 
-    if (detailsUsers.length > 0) {
-      sendSuccessResponse(res, 'Success Get All Details Users', formattedDetailsUsers);
-    } else {
-      sendNotFoundResponse(res, 'Details Users not found');
-    }
+    const { limit, offset } = getPagination(page, size);
+    const data = await DetailUsers.findAndCountAll({
+      limit,
+      offset,
+      where: {},
+    });
+
+    const formattedDetailsUsers = data.rows.map(formatDetailsUser);
+    const detailsUsers = getPagingData(formattedDetailsUsers, page, limit);
+
+    return res.json(detailsUsers);
   } catch (error) {
-    handleServerError(res, error);
+    return handleServerError(res, error);
   }
 };
 
 const getDetailsUserById = async (req, res) => {
   const detailsUserId = req.params.id;
   try {
-    const detailsUser = await DetailsUsers.findByPk(detailsUserId);
+    const detailsUser = await DetailUsers.findByPk(detailsUserId);
     if (detailsUser) {
       sendSuccessResponse(res, 'Success Get Details User', formatDetailsUser(detailsUser));
     } else {
@@ -35,14 +42,14 @@ const createDetailsUser = async (req, res) => {
     await validateDetailsUser(req.body);
 
     const { users_id, full_name, number_phone, social_media_id, address_user_id, detail_shop_id } = req.body;
-    const isFullNameTaken = await DetailsUsers.findOne({ where: { full_name } });
+    const isFullNameTaken = await DetailUsers.findOne({ where: { full_name } });
 
     if (isFullNameTaken) {
       sendClientErrorResponse(res, 'Full Name is already taken');
       return;
     }
 
-    const newDetailsUser = await DetailsUsers.create({
+    const newDetailsUser = await DetailUsers.create({
       users_id,
       full_name,
       number_phone,
@@ -54,6 +61,61 @@ const createDetailsUser = async (req, res) => {
     sendCreatedResponse(res, 'Details User created successfully', formatDetailsUser(newDetailsUser));
   } catch (error) {
     handleValidationError(res, error);
+  }
+};
+
+const updateDetailsUser = async (req, res) => {
+  try {
+    await validateDetailsUser(req.body);
+
+    const detailsUserId = req.params.id;
+    const { full_name, number_phone, social_media_id, address_user_id, detail_shop_id } = req.body;
+
+    const detailsUser = await DetailUsers.findByPk(detailsUserId);
+    if (!detailsUser) {
+      sendNotFoundResponse(res, 'Details User not found');
+      return;
+    }
+
+    if (full_name !== detailsUser.full_name) {
+      const isFullNameTaken = await DetailUsers.findOne({
+        where: { full_name },
+      });
+
+      if (isFullNameTaken) {
+        sendClientErrorResponse(res, 'Full Name is already taken');
+        return;
+      }
+    }
+
+    detailsUser.full_name = full_name;
+    detailsUser.number_phone = number_phone;
+    detailsUser.social_media_id = social_media_id;
+    detailsUser.address_user_id = address_user_id;
+    detailsUser.detail_shop_id = detail_shop_id;
+
+    await detailsUser.save();
+
+    sendSuccessResponse(res, 'Details User updated successfully', formatDetailsUser(detailsUser));
+  } catch (error) {
+    handleValidationError(res, error);
+  }
+};
+
+const deleteDetailsUser = async (req, res) => {
+  const detailsUserId = req.params.id;
+  try {
+    const detailsUser = await DetailUsers.findByPk(detailsUserId);
+    if (!detailsUser) {
+      sendNotFoundResponse(res, 'Details User not found');
+      return;
+    }
+
+    await detailsUser.destroy();
+
+    sendSuccessResponse(res, 'Details User deleted successfully');
+  } catch (error) {
+    handleServerError(res, error);
   }
 };
 
@@ -109,6 +171,6 @@ module.exports = {
   getAllDetailsUsers,
   getDetailsUserById,
   createDetailsUser,
-  createDetailsUser,
-  createDetailsUser,
+  updateDetailsUser,
+  deleteDetailsUser,
 };
