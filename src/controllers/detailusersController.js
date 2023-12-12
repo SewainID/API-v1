@@ -1,6 +1,7 @@
 const DetailsUsers = require('../../models/detailusersModels');
 const Joi = require('joi');
 const { getPagination, getPagingData } = require('../utils/pagination');
+const User = require('../../models/UsersModels');
 
 const formatDetailsUser = (detailsUser) => ({
   id: detailsUser.id,
@@ -34,15 +35,30 @@ const getAllDetailsUsers = async (req, res) => {
     const data = await DetailsUsers.findAndCountAll({
       limit,
       offset,
-      where: {},
+      ...queryParams,
+      include: [{ model: User, as: 'detailUser' }],
     });
 
-    const formattedDetailsUsers = data.rows.map(formatDetailsUser);
-    const detailsUsers = getPagingData(formattedDetailsUsers, page, limit);
+    const formattedDetailsUsers = data.rows.map((detailuser) => ({
+      id: detailuser.id,
+      users_id: detailuser.users_id,
+      fullname: detailuser.email,
+      number_phone: detailuser.number_phone,
+      social_media_id: detailuser.social_media_id,
+      address_user_id: detailuser.address_user_id,
+      detail_shop_id: detailuser.detail_shop_id,
+    }));
 
-    return res.json(detailsUsers);
+    const pagingData = getPagingData(formattedDetailsUsers, page, limit);
+
+    return res.status(200).json({
+      message: 'Success Get All Users',
+      results: formattedDetailsUsers,
+      paging: pagingData,
+    });
   } catch (error) {
-    return handleServerError(res, error);
+    console.error('Error retrieving Detail Users:', error);
+    return res.status(500).send('Internal Server Error');
   }
 };
 

@@ -18,12 +18,10 @@ const setupAssociations = () => {
   // Association between Users and DetailsUsers
   Users.hasOne(DetailsUsers, {
     foreignKey: 'users_id',
-    onDelete: 'CASCADE',
   });
 
   DetailsUsers.belongsTo(Users, {
     foreignKey: 'users_id',
-    as: 'user',
   });
 };
 

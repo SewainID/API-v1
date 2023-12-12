@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/dbConfig');
+
 const DetailShop = sequelize.define(
   'DetailShop',
   {
@@ -23,6 +24,5 @@ const DetailShop = sequelize.define(
     tableName: 'detail_shops',
   }
 );
-
 
 module.exports = DetailShop;

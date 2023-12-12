@@ -16,22 +16,12 @@ router.get('/', async (req, res) => {
       limit,
       offset,
       ...queryParams,
+      include: [{ model: DetailsUsers }],
     });
-    const formattedUsers = users.rows.map((user) => ({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      created_at: user.created_at,
-      updated_at: user.updated_at,
-    }));
 
     const pagingData = getPagingData(users, page, limit);
 
-    return res.status(200).json({
-      message: 'Success Get All Users',
-      results: formattedUsers,
-      paging: pagingData,
-    });
+    return res.status(200).json(pagingData);
   } catch (error) {
     console.error('Error retrieving users:', error);
 
@@ -42,17 +32,11 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const userId = req.params.id;
   try {
-    const user = await User.findByPk(userId);
+    const user = await User.findByPk(userId, { include: [{ model: DetailsUsers }] });
     if (user) {
       return res.status(200).json({
         message: 'Success Get User',
-        results: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          created_at: user.created_at,
-          updated_at: user.updated_at,
-        },
+        results: user,
       });
     } else {
       res.status(404).send('User not found');

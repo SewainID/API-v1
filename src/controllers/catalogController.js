@@ -26,7 +26,7 @@ const getAllCatalogs = async (req, res) => {
 const getCatalogByid = async (req, res) => {
   const catalogById = req.params.id;
   try {
-    const catalog = await Catalog.findByPk(catalogById);
+    const catalog = await Catalog.findByPk(catalogById, { include: [{ model: DetailShop, as: 'shop' }] });
     if (!catalog) {
       return res.status(404).json({ error: 'Catalog not found' });
     }
