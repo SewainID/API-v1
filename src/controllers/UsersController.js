@@ -16,6 +16,7 @@ router.get('/', async (req, res) => {
       limit,
       offset,
       ...queryParams,
+      attributes: { exclude: ['password'] },
       include: [{ model: DetailsUsers }],
     });
 
@@ -32,7 +33,10 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const userId = req.params.id;
   try {
-    const user = await User.findByPk(userId, { include: [{ model: DetailsUsers }] });
+    const user = await User.findByPk(userId, {
+      attributes: { exclude: ['password'] },
+      include: [{ model: DetailsUsers }]
+    });
     if (user) {
       return res.status(200).json({
         message: 'Success Get User',
@@ -66,23 +70,27 @@ router.delete('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const userId = req.params.id;
   const { username, email, detail_users_id } = req.body;
+  let results;
   try {
-    const user = await User.findByPk(userId);
+    const user = await User.findByPk(userId, {
+      attributes: {exclude: ['password']},
+      include: [{model: DetailsUsers}]
+    });
     if (!user) {
       return res.status(404).send('User not found');
     }
 
     if (username && username !== user.username) {
-      const existingUsernameUser = await User.findOne({ where: { username } });
+      const existingUsernameUser = await User.findOne({where: {username}});
       if (existingUsernameUser) {
-        return res.status(400).json({ message: 'Username already exists' });
+        return res.status(400).json({message: 'Username already exists'});
       }
     }
 
     if (email && email !== user.email) {
-      const existingEmailUser = await User.findOne({ where: { email } });
+      const existingEmailUser = await User.findOne({where: {email}});
       if (existingEmailUser) {
-        return res.status(400).json({ message: 'Email already exists' });
+        return res.status(400).json({message: 'Email already exists'});
       }
     }
 
@@ -92,14 +100,25 @@ router.put('/:id', async (req, res) => {
 
     user.updated_at = new Date();
     await user.save();
+    let detail_user = {};
+    // update details users
+    if (req.body.detail_user) {
+      if (!user.detail_user) {
+        user.detail_user = await DetailsUsers.create({
+          ...req.body.detail_user,
+          users_id: user.id
+        })
+      } else {
+        DetailsUsers.update(req.body.detail_user, {
+          where: {id: user.detail_user.id}
+        });
+        user.detail_user = await DetailsUsers.findByPk(user.detail_user.id)
+      }
+    }
+
     res.status(201).json({
       message: 'User updated successfully',
-      results: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        updated_at: user.updated_at,
-      },
+      results: user,
     });
   } catch (error) {
     console.error('Error updating user:', error);
