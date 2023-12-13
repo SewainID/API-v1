@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const DetailsUsers = require('../../models/detailusersModels');
+const DetailsUsers = require('../../models/detailuserModels');
 const User = require('../../models/UsersModels');
+const AddressUsers = require('../../models/addressUserModels');
 const bcrypt = require('bcrypt');
 const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
 
@@ -35,7 +36,7 @@ router.get('/:id', async (req, res) => {
   try {
     const user = await User.findByPk(userId, {
       attributes: { exclude: ['password'] },
-      include: [{ model: DetailsUsers }]
+      include: [{ model: DetailsUsers }],
     });
     if (user) {
       return res.status(200).json({
@@ -73,24 +74,24 @@ router.put('/:id', async (req, res) => {
   let results;
   try {
     const user = await User.findByPk(userId, {
-      attributes: {exclude: ['password']},
-      include: [{model: DetailsUsers}]
+      attributes: { exclude: ['password'] },
+      include: [{ model: DetailsUsers }],
     });
     if (!user) {
       return res.status(404).send('User not found');
     }
 
     if (username && username !== user.username) {
-      const existingUsernameUser = await User.findOne({where: {username}});
+      const existingUsernameUser = await User.findOne({ where: { username } });
       if (existingUsernameUser) {
-        return res.status(400).json({message: 'Username already exists'});
+        return res.status(400).json({ message: 'Username already exists' });
       }
     }
 
     if (email && email !== user.email) {
-      const existingEmailUser = await User.findOne({where: {email}});
+      const existingEmailUser = await User.findOne({ where: { email } });
       if (existingEmailUser) {
-        return res.status(400).json({message: 'Email already exists'});
+        return res.status(400).json({ message: 'Email already exists' });
       }
     }
 
@@ -106,13 +107,13 @@ router.put('/:id', async (req, res) => {
       if (!user.detail_user) {
         user.detail_user = await DetailsUsers.create({
           ...req.body.detail_user,
-          users_id: user.id
-        })
+          users_id: user.id,
+        });
       } else {
         DetailsUsers.update(req.body.detail_user, {
-          where: {id: user.detail_user.id}
+          where: { id: user.detail_user.id },
         });
-        user.detail_user = await DetailsUsers.findByPk(user.detail_user.id)
+        user.detail_user = await DetailsUsers.findByPk(user.detail_user.id);
       }
     }
 
@@ -164,33 +165,6 @@ router.put('/:id/update-password', async (req, res) => {
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
     console.error('Error updating password:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-router.put('/:id/update-address', async (req, res) => {
-  const userId = req.params.id;
-  const { address } = req.body;
-
-  try {
-    const user = await User.findByPk(userId);
-
-    if (user) {
-      user.address = address;
-      await user.save();
-
-      const detailsUser = await DetailsUsers.findOne({ where: { users_id: userId } });
-      if (detailsUser) {
-        detailsUser.address = address;
-        await detailsUser.save();
-      }
-
-      res.json({ message: 'Address updated successfully', user });
-    } else {
-      res.status(404).send('User not found');
-    }
-  } catch (error) {
-    console.error('Error updating address:', error);
     res.status(500).send('Internal Server Error');
   }
 });

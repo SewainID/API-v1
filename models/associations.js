@@ -1,7 +1,8 @@
 const DetailShop = require('./detailshopModels');
 const Catalog = require('./catalogModels');
-const DetailsUsers = require('./detailusersModels');
+const DetailsUsers = require('./detailuserModels');
 const Users = require('./UsersModels');
+const AddressUsers = require('./addressUserModels'); // Import the new model
 
 const setupAssociations = () => {
   // Association between DetailShop and Catalog
@@ -22,6 +23,17 @@ const setupAssociations = () => {
 
   DetailsUsers.belongsTo(Users, {
     foreignKey: 'users_id',
+  });
+
+  // Association between DetailsUsers and AddressUsers
+  AddressUsers.hasOne(DetailsUsers, {
+    foreignKey: 'address_user_id',
+    onDelete: 'CASCADE',
+  });
+
+  DetailsUsers.belongsTo(AddressUsers, {
+    foreignKey: 'address_user_id',
+    as: 'address_user',
   });
 };
 
