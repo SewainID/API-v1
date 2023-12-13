@@ -9,6 +9,7 @@ const catalogController = require('../controllers/catalogController');
 const { attachmentsControllers } = require('../controllers/attachmentsController');
 const detailShopController = require('../controllers/detailshopController');
 const detailsUsersController = require('../controllers/detailusersController');
+const addressUsersController = require('../controllers/addressUsersController');
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -37,6 +38,12 @@ router.get('/detail-shops/:id', detailShopController.getDetailShopById);
 router.post('/detail-shops', detailShopController.createDetailShop);
 router.put('/detail-shops/:id', detailShopController.updateDetailShop);
 router.delete('/detail-shops/:id', detailShopController.deleteDetailShop);
+
+router.get('/address-users', addressUsersController.getAllAddressUsers);
+router.get('/address-users/:id', addressUsersController.getAddressUserById);
+router.post('/address-users', addressUsersController.createAddressUser);
+router.put('/address-users/:id', addressUsersController.updateAddressUser);
+router.delete('/address-users/:id', addressUsersController.deleteAddressUser);
 
 router.post('/attachments', upload.single('file'), attachmentsControllers);
 

@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/dbConfig');
-const { DetailShop } = require('./detailshopModels');
 
 const Catalog = sequelize.define(
   'Catalog',
@@ -15,10 +14,6 @@ const Catalog = sequelize.define(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
-      references: {
-        model: DetailShop,
-        key: 'id',
-      },
     },
     name: {
       type: DataTypes.STRING,

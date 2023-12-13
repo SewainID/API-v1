@@ -55,6 +55,10 @@ const DetailsUsers = sequelize.define(
         model: 'detail_shops',
         key: 'id',
       },
+      photo_url: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
     },
   },
   {

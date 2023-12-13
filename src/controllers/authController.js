@@ -5,7 +5,7 @@ const User = require('../../models/UsersModels');
 
 const generateAccessToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
-    expiresIn: '1h',
+    expiresIn: '99999998898999899h',
   });
 };
 
@@ -31,14 +31,11 @@ const register = async (req, res) => {
     }
 
     const { email, password, username } = req.body;
-
-    // Check if the user already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: 'Register Failed!', details: 'Email already exists' });
     }
 
-    // Check if username is already exists
     const existingUsername = await User.findOne({ where: { username } });
     if (existingUsername) {
       return res.status(400).json({
@@ -47,17 +44,14 @@ const register = async (req, res) => {
       });
     }
 
-    // Hash the password before saving it
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user
     const newUser = await User.create({
       email,
       password: hashedPassword,
       username,
     });
 
-    // Generate JWT token
     const token = generateAccessToken(newUser);
 
     res.status(201).json({
@@ -85,8 +79,6 @@ const login = async (req, res) => {
     }
 
     const { email, password } = req.body;
-
-    // Check if the user exists
     const user = await User.findOne({ where: { email } });
     if (!user) {
       return res.status(400).json({
@@ -95,7 +87,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Check if the password is correct
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
       return res.status(400).json({
@@ -103,8 +94,6 @@ const login = async (req, res) => {
         details: 'Password is incorrect',
       });
     }
-
-    // Generate JWT token
     const token = generateAccessToken(user);
 
     res.status(200).json({
