@@ -80,6 +80,7 @@ const login = async (req, res) => {
 
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
+
     if (!user) {
       return res.status(400).json({
         message: 'Login Failed!',
@@ -88,6 +89,7 @@ const login = async (req, res) => {
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
+
     if (!validPassword) {
       return res.status(400).json({
         message: 'Login Failed!',

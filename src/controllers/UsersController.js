@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const DetailsUsers = require('../../models/detailuserModels');
 const User = require('../../models/UsersModels');
-const AddressUsers = require('../../models/addressUserModels');
 const bcrypt = require('bcrypt');
 const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
 
@@ -102,7 +101,7 @@ router.put('/:id', async (req, res) => {
     user.updated_at = new Date();
     await user.save();
     let detail_user = {};
-    // update details users
+
     if (req.body.detail_user) {
       if (!user.detail_user) {
         user.detail_user = await DetailsUsers.create({
@@ -138,33 +137,32 @@ router.put('/:id/update-password', async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
-
-    if (!isCurrentPasswordValid) {
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
       return res.status(400).json({
         message: 'Password update failed!',
         details: 'Current password is incorrect.',
       });
     }
-
-    const isSamePassword = newPassword.trim() === confirmPassword.trim();
-
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
     if (isSamePassword) {
       return res.status(400).json({
         message: 'Password update failed!',
         details: 'New password must be different from the current password.',
       });
     }
-
-    const hashedNewPassword = await bcrypt.hash(newPassword.trim(), 10);
-    user.password = hashedNewPassword;
-    user.updated_at = new Date();
-
-    await user.save();
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        message: 'Password update failed!',
+        details: 'New password and confirm password do not match.',
+      });
+    }
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    await user.update({ password: hashedNewPassword });
 
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
-    console.error('Error updating password:', error);
+    console.error('Error updating password by ID:', error);
     res.status(500).send('Internal Server Error');
   }
 });
