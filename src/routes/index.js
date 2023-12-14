@@ -13,6 +13,7 @@ const addressUsersController = require('../controllers/addressUsersController');
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const mlProxy = require('../controllers/mlProxyController');
 
 router.get('/version', getVersion);
 router.get('/ping', ping);
@@ -46,5 +47,8 @@ router.put('/address-users/:id', addressUsersController.updateAddressUser);
 router.delete('/address-users/:id', addressUsersController.deleteAddressUser);
 
 router.post('/attachments', upload.single('file'), attachmentsControllers);
+
+router.use('/ml', mlProxy);
+
 
 module.exports = router;
