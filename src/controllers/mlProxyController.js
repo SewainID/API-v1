@@ -2,7 +2,7 @@
 const {createProxyMiddleware} =  require("http-proxy-middleware");
 
 const options = {
-    target: process.env.ML_SERVICE_URL || '', // target host
+    target: process.env.ML_SERVICE_URL, // target host
     changeOrigin: true, // needed for virtual hosted sites
     pathRewrite: {
         '^/api/v1/ml': '', // rewrite path

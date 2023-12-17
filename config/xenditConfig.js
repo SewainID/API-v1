@@ -1,8 +1,7 @@
-const xenditClient = require('xendit-node');
+// const Xendit = require('xendit-node');
 
-const xendit = new xenditClient({
-    secretKey: process.env.XENDIT_API_KEY ||
-    'xnd_public_development_sbXID2gxRaCfgcy5bOINsQ36taLYTA1H8ZfwQx2gBeL47JT3PnSQRnmQY5Y',
-});
+// const xendit = new Xendit({
+//     secretKey: process.env.XENDIT_API_KEY
+// });
 
-module.exports = xendit;
+// module.exports = { xendit };
