@@ -10,6 +10,7 @@ const { attachmentsControllers } = require('../controllers/attachmentsController
 const detailShopController = require('../controllers/detailshopController');
 const detailsUsersController = require('../controllers/detailusersController');
 const addressUsersController = require('../controllers/addressUsersController');
+const SocialMediaUsersController = require('../controllers/socialmediaController');
 const invoiceController = require('../controllers/invoiceController');
 const multer = require('multer');
 const storage = multer.memoryStorage();
@@ -47,11 +48,15 @@ router.post('/address-users', addressUsersController.createAddressUser);
 router.put('/address-users/:id', addressUsersController.updateAddressUser);
 router.delete('/address-users/:id', addressUsersController.deleteAddressUser);
 
+router.get('/social-media', SocialMediaUsersController.getAllSocialMediaUsers);
+router.get('/social-media/:id', SocialMediaUsersController.getSocialMediaUserById);
+router.post('/social-media', SocialMediaUsersController.createSocialMediaUser);
+router.put('/social-media/:id', SocialMediaUsersController.updateSocialMediaUser);
+router.delete('/social-media/:id', SocialMediaUsersController.deleteSocialMediaUser);
+
 router.post('/attachments', upload.single('file'), attachmentsControllers);
 router.post('/invoices', invoiceController.createInvoice);
 
 router.use('/ml', mlProxy);
-
-
 
 module.exports = router;
