@@ -35,6 +35,17 @@ const setupAssociations = () => {
     foreignKey: 'address_user_id',
     as: 'address_user',
   });
+
+  // Association between DetailsUsers and DetailShop
+  DetailShop.hasOne(DetailsUsers, {
+    foreignKey: 'address_user_id',
+    onDelete: 'CASCADE',
+  });
+
+  DetailsUsers.belongsTo(DetailShop, {
+    foreignKey: 'address_user_id',
+    as: 'detail_shop',
+  });
 };
 
 module.exports = setupAssociations;
