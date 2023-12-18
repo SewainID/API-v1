@@ -2,7 +2,8 @@ const DetailShop = require('./detailshopModels');
 const Catalog = require('./catalogModels');
 const DetailsUsers = require('./detailuserModels');
 const Users = require('./UsersModels');
-const AddressUsers = require('./addressUserModels'); // Import the new model
+const AddressUsers = require('./addressUserModels');
+const SocialMediaUsers = require('./socialmediaModels');
 
 const setupAssociations = () => {
   // Association between DetailShop and Catalog
@@ -46,6 +47,16 @@ const setupAssociations = () => {
     foreignKey: 'detail_shop_id',
     as: 'detail_shop',
   });
-};
 
+  // // Association between SocialMediaUsers and DetailsUsers
+  // SocialMediaUsers.hasOne(DetailsUsers, {
+  //   foreignKey: 'social_media_user_id',
+  //   onDelete: 'CASCADE',
+  // });
+
+  // DetailsUsers.belongsTo(SocialMediaUsers, {
+  //   foreignKey: 'social_media_user_id',
+  //   as: 'social_media_user',
+  // });
+};
 module.exports = setupAssociations;

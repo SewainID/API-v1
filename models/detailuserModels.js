@@ -12,7 +12,6 @@ const DetailsUsers = sequelize.define(
     },
     users_id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
     full_name: {
@@ -26,24 +25,24 @@ const DetailsUsers = sequelize.define(
     },
     social_media_id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+
       allowNull: true,
     },
     address_user_id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+
       allowNull: true,
     },
     detail_shop_id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+
       allowNull: true,
     },
     photo_url: {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
-  },  
+  },
   {
     tableName: 'detail_users',
   }

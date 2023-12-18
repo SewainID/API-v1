@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const DetailsUsers = require('../../models/detailuserModels');
 const User = require('../../models/UsersModels');
+const AddressUsers = require('../../models/addressUserModels');
+const DetailShop = require('../../models/detailshopModels');
+// const SocialMediaUsers = require('../../models/socialmediaModels');
 const bcrypt = require('bcrypt');
 const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
-const AddressUsers = require("../../models/addressUserModels");
-const DetailShop = require("../../models/detailshopModels");
 
 router.get('/', async (req, res) => {
   try {
@@ -37,14 +38,25 @@ router.get('/:id', async (req, res) => {
   try {
     const user = await User.findByPk(userId, {
       attributes: { exclude: ['password'] },
-      include: [{
-        model: DetailsUsers, include: [{
-          model: AddressUsers,
-          as: 'address_user', // This 'as' should match the one in your association
-        },{
-          model: DetailShop,
-          as: 'detail_shop', // This 'as' should match the one in your association
-        }], }],
+      include: [
+        {
+          model: DetailsUsers,
+          include: [
+            {
+              model: AddressUsers,
+              as: 'address_user',
+            },
+            {
+              model: DetailShop,
+              as: 'detail_shop',
+            },
+            // {
+            //   model: SocialMediaUsers,
+            //   as: 'social_media_user',
+            // },
+          ],
+        },
+      ],
     });
     if (user) {
       return res.status(200).json({
