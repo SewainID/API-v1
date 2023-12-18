@@ -48,10 +48,10 @@ router.put('/address-users/:id', addressUsersController.updateAddressUser);
 router.delete('/address-users/:id', addressUsersController.deleteAddressUser);
 
 router.post('/attachments', upload.single('file'), attachmentsControllers);
-
-//router.post('/invoices', invoiceController.createInvoice);
+router.post('/invoices', invoiceController.createInvoice);
 
 router.use('/ml', mlProxy);
+
 
 
 module.exports = router;
