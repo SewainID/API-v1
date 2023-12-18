@@ -12,7 +12,6 @@ const Catalog = sequelize.define(
     },
     shop_id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
     name: {
@@ -21,9 +20,11 @@ const Catalog = sequelize.define(
     },
     description: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     size: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     price: {
       type: DataTypes.FLOAT,

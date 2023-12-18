@@ -10,6 +10,7 @@ const { attachmentsControllers } = require('../controllers/attachmentsController
 const detailShopController = require('../controllers/detailshopController');
 const detailsUsersController = require('../controllers/detailusersController');
 const addressUsersController = require('../controllers/addressUsersController');
+const invoiceController = require('../controllers/invoiceController');
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -47,8 +48,10 @@ router.put('/address-users/:id', addressUsersController.updateAddressUser);
 router.delete('/address-users/:id', addressUsersController.deleteAddressUser);
 
 router.post('/attachments', upload.single('file'), attachmentsControllers);
+router.post('/invoices', invoiceController.createInvoice);
 
 router.use('/ml', mlProxy);
+
 
 
 module.exports = router;
