@@ -38,12 +38,12 @@ const setupAssociations = () => {
 
   // Association between DetailsUsers and DetailShop
   DetailShop.hasOne(DetailsUsers, {
-    foreignKey: 'address_user_id',
+    foreignKey: 'detail_shop_id',
     onDelete: 'CASCADE',
   });
 
   DetailsUsers.belongsTo(DetailShop, {
-    foreignKey: 'address_user_id',
+    foreignKey: 'detail_shop_id',
     as: 'detail_shop',
   });
 };
