@@ -4,6 +4,7 @@ const DetailsUsers = require('../../models/detailuserModels');
 const User = require('../../models/UsersModels');
 const bcrypt = require('bcrypt');
 const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
+const AddressUsers = require("../../models/addressUserModels");
 
 router.get('/', async (req, res) => {
   try {
@@ -35,7 +36,11 @@ router.get('/:id', async (req, res) => {
   try {
     const user = await User.findByPk(userId, {
       attributes: { exclude: ['password'] },
-      include: [{ model: DetailsUsers }],
+      include: [{
+        model: DetailsUsers, include: [{
+          model: AddressUsers,
+          as: 'address_user', // This 'as' should match the one in your association
+        }], }],
     });
     if (user) {
       return res.status(200).json({
