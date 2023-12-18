@@ -5,6 +5,7 @@ const User = require('../../models/UsersModels');
 const bcrypt = require('bcrypt');
 const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
 const AddressUsers = require("../../models/addressUserModels");
+const DetailShop = require("../../models/detailshopModels");
 
 router.get('/', async (req, res) => {
   try {
@@ -40,6 +41,9 @@ router.get('/:id', async (req, res) => {
         model: DetailsUsers, include: [{
           model: AddressUsers,
           as: 'address_user', // This 'as' should match the one in your association
+        },{
+          model: DetailShop,
+          as: 'detail_shop', // This 'as' should match the one in your association
         }], }],
     });
     if (user) {
