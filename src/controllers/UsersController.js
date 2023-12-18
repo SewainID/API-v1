@@ -4,7 +4,7 @@ const DetailsUsers = require('../../models/detailuserModels');
 const User = require('../../models/UsersModels');
 const AddressUsers = require('../../models/addressUserModels');
 const DetailShop = require('../../models/detailshopModels');
-// const SocialMediaUsers = require('../../models/socialmediaModels');
+const SocialMediaUsers = require('../../models/socialmediaModels');
 const bcrypt = require('bcrypt');
 const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
 
@@ -50,10 +50,10 @@ router.get('/:id', async (req, res) => {
               model: DetailShop,
               as: 'detail_shop',
             },
-            // {
-            //   model: SocialMediaUsers,
-            //   as: 'social_media_user',
-            // },
+            {
+              model: SocialMediaUsers,
+              as: 'social_media_user',
+            },
           ],
         },
       ],

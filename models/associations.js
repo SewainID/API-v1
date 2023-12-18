@@ -48,15 +48,15 @@ const setupAssociations = () => {
     as: 'detail_shop',
   });
 
-  // // Association between SocialMediaUsers and DetailsUsers
-  // SocialMediaUsers.hasOne(DetailsUsers, {
-  //   foreignKey: 'social_media_user_id',
-  //   onDelete: 'CASCADE',
-  // });
+  // Association between SocialMediaUsers and DetailsUsers
+  SocialMediaUsers.hasOne(DetailsUsers, {
+    foreignKey: 'social_media_id',
+    onDelete: 'CASCADE',
+  });
 
-  // DetailsUsers.belongsTo(SocialMediaUsers, {
-  //   foreignKey: 'social_media_user_id',
-  //   as: 'social_media_user',
-  // });
+  DetailsUsers.belongsTo(SocialMediaUsers, {
+    foreignKey: 'social_media_id',
+    as: 'social_media_user',
+  });
 };
 module.exports = setupAssociations;
