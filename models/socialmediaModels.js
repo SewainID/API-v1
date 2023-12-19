@@ -12,15 +12,15 @@ const SocialMediaUsers = sequelize.define(
     },
     tiktok_username: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     instagram_username: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     facebook_username: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

@@ -12,15 +12,15 @@ const AddressUsers = sequelize.define(
     },
     recipient_name: {
       type: DataTypes.STRING(30),
-      allowNull: false,
+      allowNull: true,
     },
     full_address: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     number_phone: {
       type: DataTypes.STRING(20),
-      allowNull: false,
+      allowNull: true,
     },
     latitude: {
       type: DataTypes.STRING(100),
