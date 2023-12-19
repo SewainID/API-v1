@@ -16,8 +16,7 @@ const DetailsUsers = sequelize.define(
     },
     full_name: {
       type: DataTypes.STRING(100),
-      allowNull: false,
-      unique: true,
+      allowNull: true,
     },
     number_phone: {
       type: DataTypes.STRING(20),
