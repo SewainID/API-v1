@@ -9,7 +9,7 @@ const DetailShop = require('../../models/detailshopModels');
 
 const generateAccessToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
-    expiresIn: '999999988989998987h',
+    expiresIn: '99999998898999898h',
   });
 };
 
