@@ -12,6 +12,7 @@ const detailsUsersController = require('../controllers/detailusersController');
 const addressUsersController = require('../controllers/addressUsersController');
 const SocialMediaUsersController = require('../controllers/socialmediaController');
 const invoiceController = require('../controllers/invoiceController');
+const biteshipController = require('../controllers/biteshipController');
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -56,6 +57,7 @@ router.delete('/social-media/:id', SocialMediaUsersController.deleteSocialMediaU
 
 router.post('/attachments', upload.single('file'), attachmentsControllers);
 router.post('/invoices', invoiceController.createInvoice);
+router.get('/check_rates/:id',auth , biteshipController.checkRates);
 
 router.use('/ml', mlProxy);
 
