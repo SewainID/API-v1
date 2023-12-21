@@ -86,5 +86,10 @@ const setupAssociations = () => {
   Transaction.belongsTo(Catalog, {
     foreignKey: 'transaction_item',
   });
+
+  Transaction.belongsTo(TransactionItems, {
+    foreignKey: 'transaction_item',
+    as: 'transactionItem',
+  });
 };
 module.exports = setupAssociations;

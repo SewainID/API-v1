@@ -61,6 +61,8 @@ router.post('/invoices', invoiceController.createInvoice);
 router.get('/check_rates/:id', auth, biteshipController.checkRates);
 router.post('/create_shipment', auth, biteshipController.createShipment);
 router.post('/transactions', auth, transactionController.createTransaction);
+router.get('/transactions', auth, transactionController.getAllTransactions);
+router.get('/transactions/:id', auth, transactionController.getTransactionDetails);
 
 router.use('/ml', mlProxy);
 
