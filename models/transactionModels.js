@@ -12,23 +12,23 @@ const Transaction = sequelize.define(
     },
     user_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
     },
     payment_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
     },
     transaction_item: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
     },
     shop_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
     },
     shipment_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
     },
     start_rent_date: {
       type: DataTypes.DATE,

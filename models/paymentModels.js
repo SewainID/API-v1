@@ -10,6 +10,14 @@ const Payments = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
+    invoice_id: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     tableName: 'payments',

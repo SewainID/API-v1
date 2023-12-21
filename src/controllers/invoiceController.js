@@ -1,38 +1,72 @@
-const { Xendit } = require('xendit-node');
+const XenditAPI = require('../utils/xendit');
+// const { getDetailUsersById, getDetailUsersByShopId } = require('../utils');
 const Payments = require('../../models/paymentModels');
-
-
-const xendit = new Xendit({
-  secretKey: process.env.XENDIT_API_KEY,
-});
-
-const invoice = xendit.Invoice;
+const xendit = new XenditAPI(process.env.XENDIT_API_KEY);
 
 const createInvoice = async (req, res) => {
   try {
-    const { externalID, payerEmail, description, amount } = req.body;
-    const payment = await Payments.create({
-      externalID,
-      payerEmail,
-      description,
-      amount,
+    const invoice = await xendit.createInvoice({
+      external_id: `invoice-123123`,
+      payer_email: req.body.email,
+      description: 'anjay dari sewain nih',
+      amount: req.body.amount,
     });
 
-    const invoiceData = await invoice.createInvoice({
-      externalID,
-      payerEmail,
-      description,
-      amount,
-    });
+    const paymentDB = {
+      invoice_id: invoice.id,
+      status: invoice.status,
+    };
 
-    res.status(200).json({
-      message: 'Success Create Invoice and Payment',
-      results: { invoiceData, payment },
+    const payment = await Payments.create(paymentDB);
+    if (req.is_return) {
+      return payment;
+    }
+    res.status(201).json({
+      status: 'success',
+      data: {
+        payment,
+      },
     });
   } catch (error) {
-    console.error('Error Create Invoice and Payment:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error(error);
+    res.status(500).json({
+      status: 'fail',
+      message: error,
+    });
   }
 };
 
-module.exports = { createInvoice };
+const getInvoiceById = async (req, res) => {
+  try {
+    const payment = await Payments.findByPk(req.params.id);
+
+    if (payment) {
+      const invoice = await xendit.getInvoiceById(payment.external_id);
+      payment.invoice_url = invoice.invoice_url;
+      await payment.save();
+
+      res.status(200).json({
+        status: 'success',
+        data: {
+          payment,
+        },
+      });
+    } else {
+      res.status(404).json({
+        status: 'fail',
+        message: 'Payment not found',
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: 'fail',
+      message: error.message,
+    });
+  }
+};
+
+module.exports = {
+  createInvoice,
+  getInvoiceById,
+};

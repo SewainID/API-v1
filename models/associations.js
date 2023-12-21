@@ -4,6 +4,8 @@ const DetailsUsers = require('./detailuserModels');
 const Users = require('./UsersModels');
 const AddressUsers = require('./addressUserModels');
 const SocialMediaUsers = require('./socialmediaModels');
+const Transaction = require('../models/transactionModels');
+const TransactionItems = require('./transactionItemsModels');
 
 const setupAssociations = () => {
   // Association between DetailShop and Catalog
@@ -57,6 +59,32 @@ const setupAssociations = () => {
   DetailsUsers.belongsTo(SocialMediaUsers, {
     foreignKey: 'social_media_id',
     as: 'social_media_user',
+  });
+
+  // Association between Users and Transactions
+  Users.hasMany(Transaction, {
+    foreignKey: 'user_id',
+    onDelete: 'CASCADE',
+  });
+
+  Transaction.belongsTo(Users, {
+    foreignKey: 'user_id',
+    as: 'user',
+  });
+
+  // Association between DetailShop and Transactions
+  DetailShop.hasMany(Transaction, {
+    foreignKey: 'shop_id',
+    onDelete: 'CASCADE',
+  });
+
+  Transaction.belongsTo(DetailShop, {
+    foreignKey: 'shop_id',
+    as: 'shop',
+  });
+
+  Transaction.belongsTo(Catalog, {
+    foreignKey: 'transaction_item',
   });
 };
 module.exports = setupAssociations;
