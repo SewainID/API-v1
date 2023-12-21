@@ -4,8 +4,8 @@ const DetailsUsers = require('./detailuserModels');
 const Users = require('./UsersModels');
 const AddressUsers = require('./addressUserModels');
 const SocialMediaUsers = require('./socialmediaModels');
-const Transaction = require('../models/transactionModels');
-const TransactionItems = require('./transactionItemsModels');
+const Transaction = require('./transactionModels');
+const TransactionItems = require('./TransactionItemsModels');
 
 const setupAssociations = () => {
   // Association between DetailShop and Catalog
