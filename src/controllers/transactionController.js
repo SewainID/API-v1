@@ -5,7 +5,6 @@ const DetailShop = require('../../models/detailshopModels');
 const TransactionItems = require('../../models/transactionItemsModels');
 const Shipment = require('../../models/shipmentModels');
 const { createInvoice } = require('../controllers/invoiceController');
-const { log } = require('console');
 
 const getAllTransactions = async (req, res) => {
   try {
