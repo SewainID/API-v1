@@ -39,9 +39,47 @@ class BiteshipAPI {
     }
 
 
-    async createShipment(shipmentDetails) {
+    async createShipment(origin, destination, catalog, courier) {
+        const bodyReq = {
+            "shipper_contact_name": origin.recipient_name,
+            "shipper_contact_phone": origin.number_phone,
+            "shipper_contact_email": origin.email,
+            "shipper_organization": "Sewain",
+            "origin_contact_name": origin.recipient_name,
+            "origin_contact_phone": origin.number_phone,
+            "origin_address": origin.full_address,
+            "origin_note": "",
+            "origin_coordinate": {
+                latitude: origin.latitude,
+                longitude: origin.longitude
+            },
+            "destination_contact_name": destination.recipient_name,
+            "destination_contact_phone": destination.number_phone,
+            "destination_contact_email": destination.email,
+            "destination_address": destination.full_address,
+            "destination_coordinate": {
+                latitude : destination.latitude,
+                longitude: destination.latitude
+            },
+            "destination_note":"",
+            "courier_company": courier.company,
+            "courier_type": courier.type,
+            "courier_insurance": catalog.price * 10,
+            "delivery_type":"now",
+            "order_note": "Please be careful",
+            "metadata":{},
+            "items": [
+                {
+                    "name" : catalog.name,
+                    "description" : catalog.description,
+                    "value" : catalog.price * 10,
+                    "quantity" : 1,
+                    "weight" : 1000,
+                }
+            ]
+        }
         try {
-            const response = await this.client.post(`/shipments`, shipmentDetails);
+            const response = await this.client.post(`/v1/orders`, bodyReq);
             return response.data;
         } catch (error) {
             // Handle error appropriately

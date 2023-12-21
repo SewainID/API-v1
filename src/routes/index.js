@@ -58,6 +58,7 @@ router.delete('/social-media/:id', SocialMediaUsersController.deleteSocialMediaU
 router.post('/attachments', upload.single('file'), attachmentsControllers);
 router.post('/invoices', invoiceController.createInvoice);
 router.get('/check_rates/:id',auth , biteshipController.checkRates);
+router.post('/create_shipment',auth , biteshipController.createShipment);
 
 router.use('/ml', mlProxy);
 
