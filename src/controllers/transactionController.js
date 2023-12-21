@@ -2,7 +2,7 @@ const Transaction = require('../../models/transactionModels');
 const User = require('../../models/UsersModels');
 const Catalog = require('../../models/catalogModels');
 const DetailShop = require('../../models/detailshopModels');
-const TransactionItems = require('../../models/TransactionItemsModels');
+const TransactionItems = require('../../models/transactionitemsModels');
 const Shipment = require('../../models/shipmentModels');
 const { createInvoice } = require('../controllers/invoiceController');
 
