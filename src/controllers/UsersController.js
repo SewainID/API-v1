@@ -7,7 +7,7 @@ const DetailShop = require('../../models/detailshopModels');
 const SocialMediaUsers = require('../../models/socialmediaModels');
 const bcrypt = require('bcrypt');
 const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
-
+const {getDetailUsersById} = require('../utils');
 router.get('/', async (req, res) => {
   try {
     const page = parseInt(req.query.page || 1);
@@ -36,28 +36,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const userId = req.params.id;
   try {
-    const user = await User.findByPk(userId, {
-      attributes: { exclude: ['password'] },
-      include: [
-        {
-          model: DetailsUsers,
-          include: [
-            {
-              model: AddressUsers,
-              as: 'address_user',
-            },
-            {
-              model: DetailShop,
-              as: 'detail_shop',
-            },
-            {
-              model: SocialMediaUsers,
-              as: 'social_media_user',
-            },
-          ],
-        },
-      ],
-    });
+    const user = await getDetailUsersById(userId);
     if (user) {
       return res.status(200).json({
         message: 'Success Get User',
@@ -187,5 +166,7 @@ router.put('/:id/update-password', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 
 module.exports = router;
