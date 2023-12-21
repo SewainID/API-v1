@@ -1,5 +1,4 @@
 const XenditAPI = require('../utils/xendit');
-// const { getDetailUsersById, getDetailUsersByShopId } = require('../utils');
 const Payments = require('../../models/paymentModels');
 const xendit = new XenditAPI(process.env.XENDIT_API_KEY);
 

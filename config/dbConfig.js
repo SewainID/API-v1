@@ -1,4 +1,4 @@
-require('dotenv').config(); // Menggunakan dotenv untuk mengatur variabel lingkungan
+require('dotenv').config();
 
 const { Sequelize } = require('sequelize');
 
