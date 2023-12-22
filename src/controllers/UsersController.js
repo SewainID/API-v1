@@ -7,7 +7,7 @@ const DetailShop = require('../../models/detailshopModels');
 const SocialMediaUsers = require('../../models/socialmediaModels');
 const bcrypt = require('bcrypt');
 const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
-const {getDetailUsersById} = require('../utils');
+const { getDetailUsersById } = require('../utils');
 router.get('/', async (req, res) => {
   try {
     const page = parseInt(req.query.page || 1);
@@ -36,7 +36,29 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const userId = req.params.id;
   try {
-    const user = await getDetailUsersById(userId);
+    const user = await User.findByPk(userId, {
+      attributes: { exclude: ['password'] },
+      include: [
+        {
+          model: DetailsUsers,
+          include: [
+            {
+              model: AddressUsers,
+              as: 'address_user',
+            },
+            {
+              model: DetailShop,
+              as: 'detail_shop',
+            },
+            {
+              model: SocialMediaUsers,
+              as: 'social_media_user',
+            },
+          ],
+        },
+      ],
+    });
+
     if (user) {
       return res.status(200).json({
         message: 'Success Get User',
@@ -69,29 +91,34 @@ router.delete('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const userId = req.params.id;
-  const { username, email, detail_users_id } = req.body;
-  let results;
+  const { username, email, detail_users_id, detail_user, detail_shop, social_media_user } = req.body;
+
   try {
     const user = await User.findByPk(userId, {
       attributes: { exclude: ['password'] },
-      include: [{ model: DetailsUsers }],
+      include: [
+        {
+          model: DetailsUsers,
+          include: [
+            {
+              model: AddressUsers,
+              as: 'address_user',
+            },
+            {
+              model: DetailShop,
+              as: 'detail_shop',
+            },
+            {
+              model: SocialMediaUsers,
+              as: 'social_media_user',
+            },
+          ],
+        },
+      ],
     });
+
     if (!user) {
       return res.status(404).send('User not found');
-    }
-
-    if (username && username !== user.username) {
-      const existingUsernameUser = await User.findOne({ where: { username } });
-      if (existingUsernameUser) {
-        return res.status(400).json({ message: 'Username already exists' });
-      }
-    }
-
-    if (email && email !== user.email) {
-      const existingEmailUser = await User.findOne({ where: { email } });
-      if (existingEmailUser) {
-        return res.status(400).json({ message: 'Email already exists' });
-      }
     }
 
     if (username) user.username = username;
@@ -100,23 +127,49 @@ router.put('/:id', async (req, res) => {
 
     user.updated_at = new Date();
     await user.save();
-    let detail_user = {};
 
-    if (req.body.detail_user) {
-      if (!user.detail_user) {
-        user.detail_user = await DetailsUsers.create({
-          ...req.body.detail_user,
+    if (detail_user) {
+      if (!user.DetailsUser) {
+        user.DetailsUser = await DetailsUsers.create({
+          ...detail_user,
           users_id: user.id,
         });
       } else {
-        DetailsUsers.update(req.body.detail_user, {
-          where: { id: user.detail_user.id },
+        await user.DetailsUser.update(detail_user);
+        if (detail_user.address_users) {
+          await user.DetailsUser.address_user.update(detail_user.address_users);
+        }
+
+        user.DetailsUser = await user.DetailsUser.save();
+      }
+    }
+    if (detail_shop) {
+      if (!user.DetailsUser.detail_shop) {
+        user.DetailsUser.detail_shop = await DetailShop.create({
+          ...detail_shop,
+          users_id: user.id,
         });
-        user.detail_user = await DetailsUsers.findByPk(user.detail_user.id);
+      } else {
+        await user.DetailsUser.detail_shop.update(detail_shop);
+        user.DetailsUser.detail_shop = await user.DetailsUser.detail_shop.save();
       }
     }
 
-    res.status(201).json({
+    if (social_media_user) {
+      if (!user.DetailsUser.social_media_user) {
+        user.DetailsUser.social_media_user = await social_media_user.create({
+          ...social_media_user,
+          users_id: user.id,
+        });
+      } else {
+        await user.DetailsUser.social_media_user.update(social_media_user);
+        user.DetailsUser.social_media_user = await user.DetailsUser.social_media_user.save();
+      }
+    }
+
+    console.log('Updated User:', user.toJSON());
+
+    res.status(200).json({
       message: 'User updated successfully',
       results: user,
     });
@@ -166,7 +219,5 @@ router.put('/:id/update-password', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
-
 
 module.exports = router;

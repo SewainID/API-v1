@@ -9,7 +9,7 @@ const DetailShop = require('../../models/detailshopModels');
 
 const generateAccessToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
-    expiresIn: '99999998898999898h',
+    expiresIn: '72h',
   });
 };
 
@@ -95,30 +95,35 @@ const login = async (req, res) => {
     }
 
     const { email, password } = req.body;
-    const user = await User.findOne(
-      { where: { email } },
-      {
-        include: [
-          {
-            model: DetailsUsers,
-            include: [
-              {
-                model: AddressUsers,
-                as: 'address_user',
-              },
-              {
-                model: DetailShop,
-                as: 'detail_shop',
-              },
-              {
-                model: SocialMediaUsers,
-                as: 'social_media_user',
-              },
-            ],
-          },
-        ],
-      }
-    );
+    const user = await User.findOne({
+      where: { email },
+      include: [
+        {
+          model: DetailsUsers,
+          include: [
+            {
+              model: AddressUsers,
+              as: 'address_user',
+            },
+            {
+              model: DetailShop,
+              as: 'detail_shop',
+            },
+            {
+              model: SocialMediaUsers,
+              as: 'social_media_user',
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        message: 'Login Failed!',
+        details: 'Email not found',
+      });
+    }
 
     if (!user.DetailsUser) {
       const newSocialMediaUser = await SocialMediaUsers.create();
@@ -133,52 +138,28 @@ const login = async (req, res) => {
         detail_shop_id: newDetailShop.id,
       });
     } else {
-      if (!user.DetailsUser.social_media_id) {
-        const newSocialMediaUser = await SocialMediaUsers.create();
-        const newDetailsUser = await DetailsUsers.update(
-          {
-            social_media_id: newSocialMediaUser.id,
-          },
-          {
-            where: {
-              id: user.DetailsUser.id,
-            },
-          }
-        );
-      }
-      if (!user.DetailsUser.address_user_id) {
-        const newAddressUser = await AddressUsers.create();
-        const newDetailsUser = await DetailsUsers.update(
-          {
-            address_user_id: newAddressUser.id,
-          },
-          {
-            where: {
-              id: user.DetailsUser.id,
-            },
-          }
-        );
-      }
-      if (!user.DetailsUser.detail_shop_id) {
-        const newDetailShop = await DetailShop.create();
-        const newDetailsUser = await DetailsUsers.update(
-          {
-            detail_shop_id: newDetailShop.id,
-          },
-          {
-            where: {
-              id: user.DetailsUser.id,
-            },
-          }
-        );
-      }
-    }
+      const updates = {};
 
-    if (!user) {
-      return res.status(400).json({
-        message: 'Login Failed!',
-        details: 'Email not found',
-      });
+      if (!user.DetailsUser.social_media_user) {
+        const newSocialMediaUser = await SocialMediaUsers.create();
+        updates.social_media_id = newSocialMediaUser.id;
+      }
+      if (!user.DetailsUser.address_user) {
+        const newAddressUser = await AddressUsers.create();
+        updates.address_user_id = newAddressUser.id;
+      }
+      if (!user.DetailsUser.detail_shop) {
+        const newDetailShop = await DetailShop.create();
+        updates.detail_shop_id = newDetailShop.id;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await user.DetailsUser.update(updates, {
+          where: {
+            id: user.DetailsUser.id,
+          },
+        });
+      }
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
@@ -189,6 +170,7 @@ const login = async (req, res) => {
         details: 'Password is incorrect',
       });
     }
+
     const token = generateAccessToken(user);
 
     res.status(200).json({
