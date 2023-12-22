@@ -1,32 +1,14 @@
-# 1. initial project
 
-```
-git clone https://github.com/ForRentIT/API-v1.git
-```
+<h1 align="center">Sewain</h1>
+<h3 align="center">Application for costume rental and costume rental market services, find your style here and look for opportunities!</h3>
+<p align="center">
+  <a href="https://ibb.co/Lnddp7w"><img src="https://i.ibb.co/sy993YS/Sewain-Mockup-Logo.png" alt="Sewain-Mockup-Logo" width="2480" border="0"></a>
+</p>
 
-## Git Workflow
+# Cloud Computing Path
+Creating Restful APIs and lorem ipsum dolor sit amet
 
-- 1. Checkout ke branch master
-```
-git checkout master
-```
-- 1.a pull updatean dari master
-```
-git pull
-```
-- 2. Bikin branch baru dari master
+The CC division consists of :
 
-```
-git checkout -b [nama-feature]
-```
-- 3. (kerjain fiturnya)
-
-- 4. add dan commit
-
-```
-git add .
-git commit -m "Nama Feature - Nama Perubahan"
-
-git push origin [nama-branch-feature]
-```
-- 5. baru bikin pull request ke branch develop di github
+- Saidina Hikam (C287BSY3662)
+- Sandy Budi Wirawan (C287BSY3649)
