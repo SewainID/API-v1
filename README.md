@@ -1,4 +1,5 @@
-# Machine Learning Path : ML API Documentation
+# Cloud Computing Path : CC API Documentation
+![image](https://cdn.discordapp.com/attachments/982290716011167745/1188034322687594557/Sewain_Cloud_Infrastructure.jpg?ex=65990e2f&is=6586992f&hm=5355ba79780b4d5eab6a19a4de4f365830422e174b3f7903db012bb5280599a7&)<h1 align="center">SewaIn Cloud Infrastructure</h1>
 ## Authors by Team ID: `CH2-PS129`
 | Name | Bangkit-ID     | Github-Profile                       |
 | :-------- | :------- | :-------------------------------- |
