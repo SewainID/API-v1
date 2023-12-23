@@ -7,7 +7,7 @@ const DetailShop = require('../../models/detailshopModels');
 const SocialMediaUsers = require('../../models/socialmediaModels');
 const bcrypt = require('bcrypt');
 const { getPagination, getPagingData, parseQueryParams } = require('../utils/pagination');
-const { getDetailUsersById } = require('../utils');
+
 router.get('/', async (req, res) => {
   try {
     const page = parseInt(req.query.page || 1);
@@ -91,7 +91,7 @@ router.delete('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const userId = req.params.id;
-  const { username, email, detail_users_id, detail_user, detail_shop, social_media_user } = req.body;
+  const { username, email, detail_users_id, detail_user, detail_shop, social_media_user, address_users } = req.body;
 
   try {
     const user = await User.findByPk(userId, {
@@ -122,7 +122,14 @@ router.put('/:id', async (req, res) => {
     }
 
     if (username) user.username = username;
-    if (email) user.email = email;
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        return res.status(400).send('Email is already in use');
+      }
+      user.email = email;
+    }
+
     if (detail_users_id) user.detail_users_id = detail_users_id;
 
     user.updated_at = new Date();
@@ -130,44 +137,94 @@ router.put('/:id', async (req, res) => {
 
     if (detail_user) {
       if (!user.DetailsUser) {
-        user.DetailsUser = await DetailsUsers.create({
-          ...detail_user,
-          users_id: user.id,
-        });
-      } else {
-        await user.DetailsUser.update(detail_user);
-        if (detail_user.address_users) {
-          await user.DetailsUser.address_user.update(detail_user.address_users);
+        try {
+          user.DetailsUser = await DetailsUsers.create({
+            ...detail_user,
+            users_id: user.id,
+          });
+        } catch (detailUserError) {
+          if (detailUserError.name === 'SequelizeUniqueConstraintError') {
+            return res.status(400).send('Full Name is already in use');
+          }
+          throw detailUserError;
         }
+      } else {
+        try {
+          await user.DetailsUser.update(detail_user);
 
-        user.DetailsUser = await user.DetailsUser.save();
+          if (detail_user.address_users) {
+            await user.DetailsUser.address_users.update(detail_user.address_users);
+          }
+
+          user.DetailsUser = await user.DetailsUser.save();
+        } catch (detailUserError) {
+          if (detailUserError.name === 'SequelizeUniqueConstraintError') {
+            return res.status(400).send('Full Name is already in use');
+          }
+          throw detailUserError;
+        }
       }
     }
+
     if (detail_shop) {
       if (!user.DetailsUser.detail_shop) {
-        user.DetailsUser.detail_shop = await DetailShop.create({
-          ...detail_shop,
-          users_id: user.id,
-        });
+        try {
+          user.DetailsUser.detail_shop = await DetailShop.create({
+            ...detail_shop,
+            users_id: user.id,
+          });
+        } catch (detailShopError) {
+          return res.status(400).send('Error creating DetailShop');
+        }
       } else {
-        await user.DetailsUser.detail_shop.update(detail_shop);
-        user.DetailsUser.detail_shop = await user.DetailsUser.detail_shop.save();
+        try {
+          await user.DetailsUser.detail_shop.update(detail_shop);
+          user.DetailsUser.detail_shop = await user.DetailsUser.detail_shop.save();
+        } catch (detailShopError) {
+          return res.status(400).send('Error updating DetailShop');
+        }
       }
     }
 
     if (social_media_user) {
       if (!user.DetailsUser.social_media_user) {
-        user.DetailsUser.social_media_user = await social_media_user.create({
-          ...social_media_user,
-          users_id: user.id,
-        });
+        try {
+          user.DetailsUser.social_media_user = await SocialMediaUsers.create({
+            ...social_media_user,
+            users_id: user.id,
+          });
+        } catch (socialMediaError) {
+          return res.status(400).send('Error creating SocialMediaUser');
+        }
       } else {
-        await user.DetailsUser.social_media_user.update(social_media_user);
-        user.DetailsUser.social_media_user = await user.DetailsUser.social_media_user.save();
+        try {
+          await user.DetailsUser.social_media_user.update(social_media_user);
+          user.DetailsUser.social_media_user = await user.DetailsUser.social_media_user.save();
+        } catch (socialMediaError) {
+          return res.status(400).send('Error updating SocialMediaUser');
+        }
       }
     }
 
-    console.log('Updated User:', user.toJSON());
+    if (address_users) {
+      if (!user.DetailsUser.address_user) {
+        try {
+          user.DetailsUser.address_user = await AddressUsers.create({
+            ...address_users,
+            users_id: user.id,
+          });
+        } catch (addressUserError) {
+          return res.status(400).send('Error creating AddressUser');
+        }
+      } else {
+        try {
+          await user.DetailsUser.address_user.update(address_users);
+          user.DetailsUser.address_user = await user.DetailsUser.address_user.save();
+        } catch (addressUserError) {
+          return res.status(400).send('Error updating AddressUser');
+        }
+      }
+    }
 
     res.status(200).json({
       message: 'User updated successfully',
