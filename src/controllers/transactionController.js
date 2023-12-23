@@ -10,7 +10,7 @@ const getAllTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.findAll({
       include: [
-        { model: User, as: 'user' },
+        { model: User, as: 'user', attributes: { exclude: ['password'] } },
         { model: DetailShop, as: 'shop' },
         { model: TransactionItems, as: 'transactionItem' },
       ],
@@ -37,7 +37,7 @@ const getTransactionDetails = async (req, res) => {
 
     const transactionDetails = await Transaction.findByPk(transactionId, {
       include: [
-        { model: User, as: 'user' },
+        { model: User, as: 'user', attributes: { exclude: ['password'] } },
         { model: DetailShop, as: 'shop' },
         { model: TransactionItems, as: 'transactionItem' },
       ],
