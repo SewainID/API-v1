@@ -95,6 +95,7 @@ const createTransaction = async (req, res) => {
       status: 'success',
       data: {
         transaction: newTransaction,
+        invoice : invoiceTransaction,
       },
     });
   } catch (error) {
