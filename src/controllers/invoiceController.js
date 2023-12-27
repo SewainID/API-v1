@@ -24,6 +24,7 @@ const createInvoice = async (req, res) => {
       status: 'success',
       data: {
         payment,
+        detail : invoice
       },
     });
   } catch (error) {
