@@ -17,19 +17,14 @@ const createInvoice = async (req, res) => {
     };
 
     const payment = await Payments.create(paymentDB);
+    const resData = {...payment.dataValues, detail : invoice};
     if (req.is_return) {
-      return {
-        data: {
-          payment,
-          detail : invoice
-        },
-      };
+      return resData;
     }
     res.status(201).json({
       status: 'success',
       data: {
-        payment,
-        detail : invoice
+        resData,
       },
     });
   } catch (error) {
